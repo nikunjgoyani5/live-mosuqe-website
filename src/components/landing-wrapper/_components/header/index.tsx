@@ -21,42 +21,11 @@ interface IProps {
   data?: ISection;
 }
 
-const initialSocials = [
-  {
-    name: "Facebook",
-    Icon: FacebookIcon,
-    url: "https://facebook.com",
-  },
-  {
-    name: "Instagram",
-    Icon: InstagramIcon,
-    url: "https://instagram.com",
-  },
-  {
-    name: "LinkedIn",
-    Icon: LinkedInIcon,
-    url: "https://linkedin.com",
-  },
-  {
-    name: "Twitter",
-    Icon: TwitterIcon,
-    url: "https://twitter.com",
-  },
-];
-
 export default function Header({ data }: IProps) {
+  console.log("Header data:", data);
   const [open, setOpen] = useState(false);
-  const [socials, setSocials] = useState(initialSocials);
-  const [editingSocial, setEditingSocial] = useState<string | null>(null);
 
-  const handleSocialUrlChange = (name: string, value: string) => {
-    setSocials((prev) =>
-      prev.map((social) =>
-        social.name === name ? { ...social, url: value } : social
-      )
-    );
-  };
-
+  if (!data?.visible) return null;
   // Type guard to check if content is header content
   const headerContent =
     data?.content && "data" in data.content && "info" in data.content
@@ -78,23 +47,102 @@ export default function Header({ data }: IProps) {
     email: headerContent?.info?.email || "info@livemosque.live",
   };
 
-  // Social links config
-  const socialLinks = [
-    {
-      name: "Facebook",
-      href: "https://www.facebook.com/livemosque.live",
-      Icon: FacebookIcon,
-      enabled: true,
-    },
-    { name: "Instagram", href: "#", Icon: InstagramIcon, enabled: false },
-    { name: "LinkedIn", href: "#", Icon: LinkedInIcon, enabled: false },
-    {
-      name: "Twitter",
-      href: "https://x.com/livemosqueus",
-      Icon: TwitterIcon,
-      enabled: true,
-    },
-  ] as const;
+  // Social links config (dynamic from data or fallback)
+  const socialIconsMap = {
+    LinkedIn: LinkedInIcon,
+    Instagram: InstagramIcon,
+    Twitter: TwitterIcon,
+    Facebook: FacebookIcon,
+  };
+  const socialIconsMapURLS = {
+    Twitter: "https://x.com/livemosqueus",
+    Facebook: "https://www.facebook.com/livemosque.live",
+  };
+  console.log("headerContent.info.socials", headerContent);
+
+  let socialLinks =
+    headerContent?.info?.socials && Array.isArray(headerContent.info.socials)
+      ? headerContent?.info?.socials
+          .map((item) => ({
+            name: item.name,
+            //@ts-ignore
+            href: item?.url || socialIconsMapURLS[item?.name] || "",
+            //@ts-ignore
+            Icon: socialIconsMap[item?.name],
+            //@ts-ignore
+            enabled: item?.url || socialIconsMapURLS[item?.name] || "",
+          }))
+          .filter((link) => link.enabled)
+      : [];
+
+  // Build socialLinks array from data?.content?.info?.socials if available
+  // let socialLinks = socialIcons
+  //   .map((item) => {
+  //     let url = "";
+  //     if (
+  //       headerContent?.info?.socials &&
+  //       Array.isArray(headerContent.info.socials)
+  //     ) {
+  //       const found = headerContent.info.socials.find(
+  //         (s: any) => s.name?.toLowerCase() === item.name.toLowerCase()
+  //       );
+  //       url = found?.url || "";
+  //     }
+  //     // fallback for Twitter and Facebook if not provided
+  //     if (!url) {
+  //       if (item.name === "Twitter") url = "https://x.com/livemosqueus";
+  //       if (item.name === "Facebook")
+  //         url = "https://www.facebook.com/livemosque.live";
+  //     }
+  //     return {
+  // name: item.name,
+  // href: url,
+  // Icon: item.Icon,
+  // enabled: !!url,
+  //     };
+  //   })
+  //   .filter((link) => link.enabled);
+
+  // Detect if user is on mobile
+  const isMobile = () => {
+    if (typeof window === "undefined") return false;
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+  };
+
+  // Function to handle email click - works for both mobile and desktop
+  const handleEmailClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    if (isMobile()) {
+      // For mobile: Use mailto protocol to open email app
+      window.location.href = `mailto:${contactInfo.email}`;
+    } else {
+      // For desktop: Open Gmail in new tab with compose window
+      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
+        contactInfo.email
+      )}`;
+      window.open(gmailUrl, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  // Function to handle mobile drawer email click
+  const handleMobileDrawerEmailClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setOpen(false);
+
+    if (isMobile()) {
+      // For mobile: Use mailto protocol to open email app
+      window.location.href = `mailto:${contactInfo.email}`;
+    } else {
+      // For desktop: Open Gmail in new tab with compose window
+      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
+        contactInfo.email
+      )}`;
+      window.open(gmailUrl, "_blank", "noopener,noreferrer");
+    }
+  };
 
   return (
     <header className="absolute top-0 left-0 xl:left-1/2 xl:-translate-x-1/2 container-1024 z-50 justify-between flex flex-col px-2 lg:px-4">
@@ -102,34 +150,49 @@ export default function Header({ data }: IProps) {
       <div className="hidden xl:flex text-white font-medium text-sm xl:text-base py-3 xl:py-4 justify-between items-center">
         {/* Left side: phone + whatsapp */}
         <div className="flex gap-4 xl:gap-6">
-          <div className="flex items-center gap-2 text-sm">
-            <CallIcon /> <span>{contactInfo.phone}</span>
+          <div className="flex items-center gap-2 text-sm max-w-[180px] overflow-hidden whitespace-nowrap truncate">
+            <p className="w-5 h-5">
+              <CallIcon />
+            </p>{" "}
+            <span className="truncate">{contactInfo.phone}</span>
           </div>
-          <div className="flex items-center gap-2 text-sm">
-            <WhatsappIcon /> <span>{contactInfo.whatsapp}</span>
+          <div className="flex items-center gap-2 text-sm max-w-[180px] overflow-hidden whitespace-nowrap truncate">
+            <p className="w-5 h-5">
+              <WhatsappIcon />
+            </p>{" "}
+            <span className="truncate">{contactInfo.whatsapp}</span>
           </div>
         </div>
 
         {/* Right side: socials + email */}
-        <div className="flex cursor-pointer items-center gap-3 text-sm">
-          <a href="#" className="hover:text-gray-300">
-            <FacebookIcon />
-          </a>
-          <a href="#" className="hover:text-gray-300">
-            <InstagramIcon />
-          </a>
-          <a href="#" className="hover:text-gray-300">
-            <LinkedInIcon />
-          </a>
-          <a href="#" className="hover:text-gray-300">
-            <TwitterIcon />
-          </a>
-        </div>
-        <div className="flex items-center gap-4 xl:gap-6 text-sm">
-          <div className="flex items-center gap-2">
-            <MailIcon />
-            <span>{contactInfo.email}</span>
+        {socialLinks.length > 0 && (
+          <div className="flex cursor-pointer items-center gap-3 text-sm">
+            {socialLinks.map(({ name, href, Icon }) => (
+              <a
+                key={name}
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={name}
+                className="hover:text-gray-300"
+              >
+                <Icon />
+              </a>
+            ))}
           </div>
+        )}
+        <div className="flex items-center gap-4 xl:gap-6 text-sm max-w-[250px] overflow-hidden whitespace-nowrap truncate">
+          <a
+            href={`mailto:${contactInfo.email}`}
+            className="flex items-center gap-3 hover:text-gray-300 cursor-pointer max-w-full overflow-hidden whitespace-nowrap truncate"
+            onClick={handleEmailClick}
+            title="Click to email us"
+          >
+            <p className="w-5 h-5">
+              <MailIcon />
+            </p>
+            <span className="truncate">{contactInfo.email}</span>
+          </a>
         </div>
       </div>
 
@@ -153,13 +216,22 @@ export default function Header({ data }: IProps) {
               <a
                 key={index}
                 href={link.path}
-                className={`${
-                  index === 0
-                    ? "relative text-primary-color font-bold before:absolute before:-bottom-1 before:left-0 before:h-[3px] before:w-full before:bg-primary-color before:rounded-full whitespace-nowrap"
-                    : "text-theme-black font-medium font-montserrat whitespace-nowrap"
-                } 2xl:text-md`}
+                className="text-theme-black font-medium font-montserrat whitespace-nowrap 2xl:text-md cursor-pointer max-w-[140px] overflow-hidden truncate"
+                onClick={(e) => {
+                  // Only handle smooth scrolling if it's a section link (starts with #)
+                  if (link.path.startsWith("#") && link.path !== "#") {
+                    e.preventDefault();
+                    const element = document.querySelector(link.path);
+                    if (element) {
+                      element.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                      });
+                    }
+                  }
+                }}
               >
-                {link.label}
+                <span className="truncate">{link.label}</span>
               </a>
             ))}
           </nav>
@@ -168,7 +240,7 @@ export default function Header({ data }: IProps) {
           <div className="flex items-center gap-2 xl:gap-3">
             <Button
               asChild
-              className="inline-flex cursor-pointer bg-primary-color text-white px-3 py-3 xl:px-6 text-xs xl:text-sm shadow-md hover:bg-blue-900 !rounded-lg h-fit"
+              className="xl:flex hidden cursor-pointer bg-primary-color text-white px-3 py-3 xl:px-6 text-xs xl:text-sm shadow-md hover:bg-blue-900 !rounded-lg h-fit"
             >
               <a href="https://live-mosque-form.web.app/signup">
                 <span className="hidden sm:inline">{headerButton.text}</span>
@@ -230,8 +302,23 @@ export default function Header({ data }: IProps) {
               <a
                 key={index}
                 href={link.path}
-                onClick={() => setOpen(false)}
-                className="text-sm text-theme-black font-medium py-2 px-3 rounded-md hover:bg-gray-100"
+                onClick={(e) => {
+                  setOpen(false);
+                  // Only handle smooth scrolling if it's a section link (starts with #)
+                  if (link.path.startsWith("#") && link.path !== "#") {
+                    e.preventDefault();
+                    setTimeout(() => {
+                      const element = document.querySelector(link.path);
+                      if (element) {
+                        element.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
+                      }
+                    }, 100); // Small delay to allow drawer to close
+                  }
+                }}
+                className="text-sm text-theme-black font-medium py-2 px-3 rounded-md hover:bg-gray-100 cursor-pointer truncate"
               >
                 {link.label}
               </a>
@@ -252,16 +339,20 @@ export default function Header({ data }: IProps) {
           {/* Contact + Socials */}
           <div className="space-y-3 text-theme-black [&_svg]:w-4 [&_svg]:h-4">
             <div className="flex items-center gap-2">
-              <CallIcon />
+              <span>
+                <CallIcon />
+              </span>
               <a
                 href={`tel:${contactInfo.phone.replace(/[^\d]/g, "")}`}
-                className="text-theme-black text-xs"
+                className="text-theme-black text-xs line-clamp-1"
               >
                 {contactInfo.phone}
               </a>
             </div>
             <div className="flex items-center gap-2">
-              <WhatsappIcon />
+              <span>
+                <WhatsappIcon />
+              </span>
               <a
                 href={`https://wa.me/${contactInfo.whatsapp.replace(
                   /[^\d]/g,
@@ -269,23 +360,24 @@ export default function Header({ data }: IProps) {
                 )}`}
                 target="_blank"
                 rel="noreferrer"
-                className="text-theme-black text-xs"
+                className="text-theme-black text-xs line-clamp-1"
               >
                 {contactInfo.whatsapp}
               </a>
             </div>
-            <div className="flex items-center gap-2">
-              <MailIcon />
-              <a
-                href={`mailto:${contactInfo.email}`}
-                className="text-theme-black text-xs"
-              >
-                {contactInfo.email}
-              </a>
-            </div>
-            <div className="flex items-center gap-3 pt-1">
-              {socialLinks.map(({ name, href, Icon, enabled }) =>
-                enabled ? (
+            <a
+              href={`mailto:${contactInfo.email}`}
+              onClick={handleMobileDrawerEmailClick}
+              className="flex items-center gap-2 text-theme-black text-xs cursor-pointer max-w-full overflow-hidden whitespace-nowrap truncate"
+            >
+              <span>
+                <MailIcon />
+              </span>
+              <span className="max-w-xl line-clamp-1">{contactInfo.email}</span>
+            </a>
+            {socialLinks.length > 0 && (
+              <div className="flex items-center gap-3 pt-1">
+                {socialLinks.map(({ name, href, Icon }) => (
                   <a
                     key={name}
                     href={href}
@@ -296,18 +388,9 @@ export default function Header({ data }: IProps) {
                   >
                     <Icon />
                   </a>
-                ) : (
-                  <span
-                    key={name}
-                    aria-label={`${name} (coming soon)`}
-                    title={`${name} (coming soon)`}
-                    className="inline-flex text-theme-black/80 opacity-60 cursor-not-allowed"
-                  >
-                    <Icon />
-                  </span>
-                )
-              )}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </aside>

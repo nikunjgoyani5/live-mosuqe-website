@@ -23,4 +23,5 @@ export type ProductSectionProps = {
     readMoreLabel?: string;
     readMoreHref?: string; // reserved if we switch to a dedicated page
     reverseLayout?: boolean;
+    modelImage?: string[];
 };

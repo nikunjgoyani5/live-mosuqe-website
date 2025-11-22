@@ -62,7 +62,7 @@ const MenuItems = ({
   };
 
   const showNewEdit = (index: number) => (
-    <>
+    <div key={index}>
       <label className="text-lg font-medium mb-2 block">
         Edit Testimonials
       </label>
@@ -71,7 +71,7 @@ const MenuItems = ({
       <TextInput name={`content.data.${index}.text`} label="Text" />
       <TextInput name={`content.data.${index}.rating`} label="Rating" />
       <TextInput name={`content.data.${index}.location`} label="Location" />
-    </>
+    </div>
   );
 
   return (
@@ -132,7 +132,13 @@ const MenuItems = ({
 };
 
 export default function ServiceSection({ data }: IProps) {
-  const { content, _id: sectionId, name, refetch } = useSectionData(data);
+  const {
+    content,
+    _id: sectionId,
+    name,
+    refetch,
+    visible,
+  } = useSectionData(data);
   const [deletedCards, setDeletedCards] = useState<string[]>([]);
   const {
     handleSubmit,
@@ -188,14 +194,22 @@ export default function ServiceSection({ data }: IProps) {
       title={name}
       addButton
       onAdd={addItem}
+      visible={visible}
     >
       <FormProvider
         onSubmit={(values) => {
           const newData = [
             //@ts-ignore
-            ...content?.data,
+            ...values?.content?.data,
           ].filter((val) => !deletedCards.includes(val.id));
-          handleSubmit({ content: { ...content, data: newData } });
+          //@ts-ignore
+          formData.content?.data?.forEach((value) => {
+            const dataIndex = newData.findIndex((val) => val.id === value.id);
+            if (dataIndex !== -1) newData[dataIndex].image = value.image;
+          });
+          handleSubmit({
+            content: { ...(values?.content || {}), data: newData },
+          });
         }}
         options={{
           defaultValues: formData,

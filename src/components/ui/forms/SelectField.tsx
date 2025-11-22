@@ -32,6 +32,7 @@ export default function SelectField({
       {label ? (
         <label htmlFor={name} className="text-dark-100 font-medium">
           {label}
+          {required ? <span className="text-red-500 ml-1">*</span> : null}
         </label>
       ) : null}
       <select
@@ -40,7 +41,7 @@ export default function SelectField({
         aria-invalid={!!err}
         defaultValue=""
         {...register(name)}
-        required={required}
+      // Do not pass native required to avoid browser tooltip
       >
         {placeholder ? (
           <option value="" disabled>

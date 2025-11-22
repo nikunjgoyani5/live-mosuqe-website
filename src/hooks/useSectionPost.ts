@@ -190,15 +190,10 @@ export function useSection(
       setOpenForms(false);
     }
   };
-  console.log(
-    "triggering media management-uploadMedia---uploadMedia-->>",
-    uploadMedia
-  );
 
   const handleSubmit = async (values: FormDataState) => {
     setLoading(true);
     let postData = { ...values };
-    console.log("values", values);
 
     try {
       if (Object.keys(uploadMedia).length > 0 || deletedMedias.length > 0) {
@@ -226,7 +221,7 @@ export function useSection(
       console.error("while update section", err);
     } finally {
       setLoading(false);
-      toggleForm();
+      setOpenForms(false);
     }
   };
 

@@ -10,13 +10,14 @@ import { BASE_URL } from "@/lib/axios";
 import Image from "next/image";
 import { ISection } from "@/constants/section.constants";
 import SectionWrapper from "./_components/sectionWrapper";
+import ImageUploadField from "./_components/ImageUploadField";
 
 interface IProps {
   data: ISection;
 }
 
 export default function AboutSection({ data }: IProps) {
-  const { content, _id: sectionId, name } = data;
+  const { content, _id: sectionId, name, visible = true } = data;
   const {
     handleSubmit,
     formData,
@@ -24,31 +25,40 @@ export default function AboutSection({ data }: IProps) {
     uploadMedia,
     addUploadMedia,
     markDeletedMedia,
+    handleOnChange,
   } = useSection(
     {
       content: content,
     },
     sectionId
   );
-  console.log("data", content);
 
   return (
-    <SectionWrapper sectionId={sectionId} title={name}>
+    <SectionWrapper sectionId={sectionId} title={name} visible={visible}>
       <FormProvider
-        onSubmit={handleSubmit}
+        onSubmit={(data) => {
+          handleSubmit({
+            content: {
+              //@ts-ignore
+              ...data?.content,
+              //@ts-ignore
+              media_url: formData?.content?.media_url,
+            },
+          });
+        }}
         options={{
           defaultValues: formData,
         }}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-x-5">
-          <div className="lg:col-span-2 space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-5">
+          <div className="lg:col-span-1 space-y-4 flex-1">
             <TextInput name="content.title" label="Heading" />
             <TextInput name="content.subtitle" label="Sub heading" />
             <TextInput name="content.body1" label="Body 1" />
             <TextInput name="content.body2" label="Body 2" />
             <TextInput name="content.readmore" label="ReadMore" />
           </div>
-          <div className="space-y-4">
+          <div className="space-y-4 lg:col-span-1">
             <TextInput name="content.main" label="Main" />
             <TextInput name="content.main_subtitle" label="Sub main" />
             {/* <SelectInput
@@ -67,10 +77,14 @@ export default function AboutSection({ data }: IProps) {
                     <Image
                       src={URL.createObjectURL(file)}
                       alt="Preview"
-                      className="w-full h-[300] sm:h-[400] lg:h-[500] object-cover rounded"
+                      className="w-full h-auto max-h-[240px] sm:max-h-[360px] lg:max-h-[537px] object-contain rounded"
                       unoptimized
-                      width={500}
+                      width={837}
                       height={500}
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      style={{
+                        borderRadius: "45px 0px 0px 45px",
+                      }}
                     />
                   ) : (
                     <video
@@ -79,7 +93,10 @@ export default function AboutSection({ data }: IProps) {
                       muted
                       loop
                       controls={false}
-                      className="w-full h-[300] sm:h-[400] lg:h-[500] object-cover rounded"
+                      className="w-full h-auto max-h-[240px] sm:max-h-[360px] lg:max-h-[537px] object-cover rounded"
+                      style={{
+                        borderRadius: "45px 0px 0px 45px",
+                      }}
                     />
                   )}
                   <button
@@ -104,10 +121,14 @@ export default function AboutSection({ data }: IProps) {
                       (formData.content as Record<string, string>).media_url
                     }`}
                     alt="Uploaded"
-                    className="w-full h-[300] sm:h-[400] lg:h-[500] object-cover rounded"
+                    className="w-full h-auto max-h-[240px] sm:max-h-[360px] lg:max-h-[537px] object-contain rounded"
                     unoptimized
-                    width={500}
+                    width={837}
                     height={500}
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    style={{
+                      borderRadius: "45px 0px 0px 45px",
+                    }}
                   />
                 ) : (
                   <video
@@ -118,7 +139,10 @@ export default function AboutSection({ data }: IProps) {
                     muted
                     loop
                     controls={false}
-                    className="w-full h-[300] sm:h-[400] lg:h-[500] object-cover rounded"
+                    className="w-full h-auto max-h-[240px] sm:max-h-[360px] lg:max-h-[537px] object-cover rounded"
+                    style={{
+                      borderRadius: "45px 0px 0px 45px",
+                    }}
                   />
                 )}
                 <button
@@ -137,16 +161,38 @@ export default function AboutSection({ data }: IProps) {
               </div>
             ) : (
               // 3️⃣ Nothing there yet → show Dropzone
-              <Dropzone
+              // <Dropzone
+              //   name="content.media_url"
+              //   files={{}}
+              //   onAddFile={addUploadMedia}
+              //   onDeleteFile={(key, path) => {
+              //     markDeletedMedia(key, path);
+              //     // else remove from uploadMedia directly if needed
+              //   }}
+              //   variant="both"
+              //   existingFiles={[]}
+              // />
+              <ImageUploadField
                 name="content.media_url"
                 files={{}}
-                onAddFile={addUploadMedia}
+                uploadMedia={uploadMedia}
+                existingImagePath={null}
+                addUploadMedia={addUploadMedia}
                 onDeleteFile={(key, path) => {
                   markDeletedMedia(key, path);
-                  // else remove from uploadMedia directly if needed
+                  handleOnChange(key, "");
+                }}
+                aspectRatio="w-full h-[240px] sm:h-[360px] lg:h-[537px] object-cover rounded"
+                existingFiles={[]}
+                markDeletedMedia={function (
+                  name: string,
+                  pathToDelete: string
+                ): void {
+                  markDeletedMedia(name, pathToDelete);
                 }}
                 variant="both"
-                existingFiles={[]}
+                targetHeight={537}
+                targetWidth={810}
               />
             )}
           </div>

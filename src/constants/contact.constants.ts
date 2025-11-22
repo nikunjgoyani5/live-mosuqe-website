@@ -1,4 +1,4 @@
-export type FieldType = "text" | "number" | "textarea" | "select";
+export type FieldType = "text" | "number" | "textarea" | "select" | "phone";
 
 export interface ContactFieldOption {
   label: string;
@@ -16,19 +16,19 @@ export interface ContactFieldBase {
 
 export type ContactField =
   | (ContactFieldBase & {
-      type: "text" | "number";
-      defaultValue?: string | number;
-    })
+    type: "text" | "number" | "phone";
+    defaultValue?: string | number;
+  })
   | (ContactFieldBase & {
-      type: "textarea";
-      rows?: number;
-      defaultValue?: string;
-    })
+    type: "textarea";
+    rows?: number;
+    defaultValue?: string;
+  })
   | (ContactFieldBase & {
-      type: "select";
-      options: ContactFieldOption[];
-      defaultValue?: string | number;
-    });
+    type: "select";
+    options: ContactFieldOption[];
+    defaultValue?: string | number;
+  });
 
 export interface ContactLeftContent {
   logoSrc?: string;
@@ -56,7 +56,7 @@ export interface ContactConfig {
 
 // Shared input classes required by the user
 export const CONTACT_INPUT_CLASS =
-    "w-full rounded-2xl border !border-slate px-3 py-2 focus:outline-none focus:ring-1 focus:ring-slate/80 text-dark-100 placeholder:text-light-slate";
+  "w-full rounded-2xl border !border-slate px-3 py-2 focus:outline-none focus:ring-1 focus:ring-slate/80 text-dark-100 placeholder:text-light-slate";
 
 // Dummy config to be replaced by API response in future
 export const CONTACT_DUMMY_CONFIG: ContactConfig = {

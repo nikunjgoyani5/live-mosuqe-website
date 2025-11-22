@@ -11,13 +11,14 @@ import { useState } from "react";
 import { CarouselApi } from "@/components/ui/carousel";
 import { useDotButton } from "./useDotButton";
 import { getMediaTypeFromPath } from "@/lib/utils";
+import imageCompression from "browser-image-compression";
 
 interface IProps {
   data: ISection;
 }
 
 export default function HeroSection({ data }: IProps) {
-  const { content, _id: sectionId, name } = data;
+  const { content, _id: sectionId, name, visible } = data;
   const [emblaApi, setCarouselApi] = useState<CarouselApi>();
   const { handleSubmit, formData, loading, handleTriggerManageMedia } =
     useSection(
@@ -44,36 +45,61 @@ export default function HeroSection({ data }: IProps) {
           : [],
       },
     };
+
     const files = e.target.files;
     if (!files || files.length === 0) return;
+
     //@ts-ignore
     const lastIndex = formData.content?.data?.length || 0;
-
     const file = files[0];
 
-    const uploadMedia = { [`content.data[${lastIndex}]`]: file };
+    // ✅ Step 1: Compress the image if it's an image type
+    let finalFile = file;
+    if (file.type.startsWith("image/")) {
+      try {
+        const options = {
+          maxSizeMB: 1, // target ~1MB
+          maxWidthOrHeight: 1920, // resize large images
+          useWebWorker: true,
+        };
+        finalFile = await imageCompression(file, options);
+        console.log(
+          `📦 Compressed from ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(
+            finalFile.size /
+            1024 /
+            1024
+          ).toFixed(2)}MB`
+        );
+      } catch (err) {
+        console.error("❌ Image compression failed:", err);
+      }
+    }
+
+    const uploadMedia = { [`content.data[${lastIndex}]`]: finalFile };
     const { uploaded: filePaths } = await handleTriggerManageMedia({
-      uploadMedia: uploadMedia,
+      uploadMedia,
       deletedMedias: [],
     });
 
     const keys = Object.keys(uploadMedia);
     keys.forEach((k, idx) => {
-      postData = setNestedValue(
-        postData,
-        k,
-        {
-          type: getMediaTypeFromPath(filePaths[idx]),
-          url: filePaths[idx],
-        },
-        true
-      );
+      if (filePaths[idx]) {
+        postData = setNestedValue(
+          postData,
+          k,
+          {
+            type: getMediaTypeFromPath(filePaths[idx]),
+            url: filePaths[idx],
+          },
+          true
+        );
+      }
     });
+
     await handleSubmit(postData);
-    // 🧹 Step 4: Reset input so same file can be re-uploaded
     e.target.value = "";
     onDotButtonClick(lastIndex);
-    console.log("✅ Uploaded file:", file);
+    console.log("✅ Uploaded file:", finalFile);
   };
 
   const handleImageDelete = async () => {
@@ -105,6 +131,7 @@ export default function HeroSection({ data }: IProps) {
       title={name}
       addButton
       onAdd={onAddHandler}
+      visible={visible}
     >
       <input
         type="file"

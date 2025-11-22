@@ -1,5 +1,5 @@
 "use client";
-import { BASE_URL } from "@/lib/axios";
+import { getFullImageUrl } from "@/lib/utils";
 import Image from "next/image";
 import React, { useRef } from "react";
 import { GoPlus } from "react-icons/go";
@@ -22,7 +22,7 @@ export const isVideo = (file: File | string) => {
     return /\.(mp4|mov|avi|mkv|webm)$/i.test(file);
   }
   // new uploaded File case
-  return file.type.startsWith("video/");
+  return file && file?.type?.startsWith("video/");
 };
 
 export default function Dropzone({
@@ -81,7 +81,7 @@ export default function Dropzone({
       {existingFiles.map((f) => (
         <div key={f.key} className="relative">
           <Image
-            src={`${BASE_URL}${f.path}`}
+            src={getFullImageUrl(f.path)}
             alt=""
             className="w-16 h-16 rounded"
             width={64}

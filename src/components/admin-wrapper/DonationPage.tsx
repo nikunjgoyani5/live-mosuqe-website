@@ -16,7 +16,7 @@ interface IProps {
   data: ISection;
 }
 
-export default function FounderVisionSection({ data }: IProps) {
+export default function DonationPageSection({ data }: IProps) {
   const { content, _id: sectionId, name, visible } = data;
   const {
     handleSubmit,
@@ -143,15 +143,6 @@ export default function FounderVisionSection({ data }: IProps) {
               </div>
             ) : (
               // 3️⃣ Nothing there yet → show Dropzone
-              // <Dropzone
-              //   name="content.media_url"
-              //   files={{}}
-              //   onAddFile={addUploadMedia}
-              //   onDeleteFile={(key, path) => {
-              //     markDeletedMedia(key, path);
-              //   }}
-              //   existingFiles={[]}
-              // />
               <ImageUploadField
                 name="content.media_url"
                 files={{}}
@@ -169,12 +160,16 @@ export default function FounderVisionSection({ data }: IProps) {
                 ): void {
                   markDeletedMedia(name, pathToDelete);
                 }}
+                skipTool={true}
               />
             )}
           </div>
           <div className="lg:col-span-2 space-y-4">
+            <TextInput name="content.label" label="Page Label" />
             <TextInput name="content.title" label="Heading" />
             <TextareaField name={`content.description`} label="Description" />
+            <TextInput name="content.btnText" label="Button Text" />
+            <TextInput name="content.path" label="Path" />
           </div>
         </div>
 

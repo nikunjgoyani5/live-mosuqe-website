@@ -6,6 +6,7 @@ import { IProduct, IProductContent } from "@/constants/section.constants";
 import { ProductSection } from "./ProductSection";
 import type { ProductSectionProps } from "./types";
 import { productData } from "./constants";
+import { getFullImageUrl } from "@/lib/utils";
 
 // Wrapper component
 interface IProps {
@@ -14,38 +15,88 @@ interface IProps {
 
 const ProductComponent = ({ data }: IProps) => {
   // Transform server product data to match component expectations
-  const transformedProducts = data ? data.map((product, index) => {
-    const productContent = product.content as unknown as IProductContent & {
-      platforms?: { name: string; image: string; link?: string }[];
-      downloadPlatforms?: { name: string; image: string; link?: string }[];
-    };
+  const transformedProducts = data
+    ? data
+        ?.filter((val) => val.visible)
+        .map((product, index) => {
+          const productContent =
+            product.content as unknown as IProductContent & {
+              platforms?: { name: string; image: string; link?: string }[];
+              downloadPlatforms?: {
+                name: string;
+                image: string;
+                link?: string;
+              }[];
+            };
 
-    const imageSrc = productContent.media_url || (productContent.images && productContent.images[0]) || "/product1.png";
-    const carouselImages = Array.isArray(productContent.images) ? productContent.images : [];
+          const imageSrc = getFullImageUrl(
+            productContent.media_url ||
+              (productContent.images && productContent.images[0]) ||
+              "/product1.png"
+          );
 
-    const platforms = Array.isArray(productContent.platforms)
-      ? productContent.platforms.map(p => ({ name: p.name, image: p.image, link: p.link }))
-      : [];
+          // const carouselImages = Array.isArray(productContent.images) ? productContent.images.map(getFullImageUrl) : [];
 
-    const downloadPlatforms = Array.isArray(productContent.downloadPlatforms)
-      ? productContent.downloadPlatforms.map(p => ({ name: p.name, image: p.image, link: p.link }))
-      : [];
+          const modelImage = Array.isArray(
+            Object.values(productContent.modalImages)
+          )
+            ? Object.values(productContent.modalImages)
+                .filter(
+                  (image) =>
+                    image && typeof image === "string" && image.trim() !== ""
+                ) // Remove empty, null, undefined, or whitespace-only values
+                .map(getFullImageUrl)
+            : [];
 
-    return {
-      typeLabel: productContent.labrl || "Product",
-      title: productContent.title || "",
-      description: productContent.description || "",
-      imageSrc,
-      carouselImages,
-      slug: product.slug as string | undefined,
-      readMoreLabel: productContent["readmore "] || "Read More",
-      readMoreHref: "#",
-      platforms,
-      downloadPlatforms,
-      reverseLayout: index % 2 === 1,
-      platformTitle: platforms.length > 0 ? "Order pre-installed Masjid Clock box" : undefined,
-    } as ProductSectionProps;
-  }) : productData;
+          const carouselImages = Array.isArray(
+            Object.values(productContent.imagesData)
+          )
+            ? Object.values(productContent.imagesData)
+                .filter(
+                  (image) =>
+                    image && typeof image === "string" && image.trim() !== ""
+                ) // Remove empty, null, undefined, or whitespace-only values
+                .map(getFullImageUrl)
+            : [];
+
+          const platforms = Array.isArray(productContent.platforms)
+            ? productContent.platforms.map((p) => ({
+                name: p.name,
+                image: getFullImageUrl(p.image),
+                link: p.link,
+              }))
+            : [];
+
+          const downloadPlatforms = Array.isArray(
+            productContent.downloadPlatforms
+          )
+            ? productContent.downloadPlatforms.map((p) => ({
+                name: p.name,
+                image: getFullImageUrl(p.image),
+                link: p.link,
+              }))
+            : [];
+
+          return {
+            typeLabel: productContent.labrl || "Product",
+            title: productContent.title || "",
+            description: productContent.description || "",
+            imageSrc,
+            carouselImages,
+            slug: product.slug as string | undefined,
+            readMoreLabel: productContent["readmore "] || "Read More",
+            readMoreHref: "#",
+            platforms,
+            modelImage,
+            downloadPlatforms,
+            reverseLayout: index % 2 === 1,
+            platformTitle:
+              platforms.length > 0
+                ? "Order pre-installed Masjid Clock box"
+                : undefined,
+          } as ProductSectionProps;
+        })
+    : productData;
 
   // const transformedProducts: ProductSectionProps[] = productData;
 
@@ -74,7 +125,10 @@ const ProductComponent = ({ data }: IProps) => {
       </div>
 
       {/* Content Container */}
-      <div id="products" className="scroll-section container-1024 px-4 sm:px-0 md:px-8 relative z-10">
+      <div
+        id="products"
+        className="scroll-section container-1024 px-4 sm:px-0 md:px-8 relative z-10"
+      >
         <div className="flex flex-col justify-center items-center pt-14 sm:py-8 md:py-16">
           <div>
             <Image

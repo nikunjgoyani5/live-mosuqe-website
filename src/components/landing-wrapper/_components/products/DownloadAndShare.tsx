@@ -35,7 +35,7 @@ export const DownloadAndShare: React.FC<Props> = ({ downloadPlatforms = [], slug
                             key={idx}
                             src={p.image}
                             alt={`Get it on ${p.name}`}
-                            className="h-full w-full minh-12 cursor-pointer hover:opacity-80 transition-opacity"
+                            className="h-full w-full lg:min-h-12 cursor-pointer hover:opacity-80 transition-opacity"
                             width={120}
                             height={110}
                         />

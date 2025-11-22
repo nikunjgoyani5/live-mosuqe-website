@@ -14,8 +14,17 @@ interface IProps {
 }
 
 export default function LandinnWrapper({ data }: IProps) {
-
-  if (!data) return null
+  if (!data) return null;
+  const headerContent =
+    //@ts-ignore
+    data?.HEADER?.content &&
+    //@ts-ignore
+    "data" in data?.HEADER.content &&
+    //@ts-ignore
+    "info" in data?.HEADER.content
+      ? //@ts-ignore
+        (data?.HEADER.content as IHeaderContent)
+      : null;
   return (
     <main>
       <Header data={data?.HEADER} />
@@ -26,7 +35,15 @@ export default function LandinnWrapper({ data }: IProps) {
       <ProductComponent data={data?.PRODUCTS} />
       <TestimonialsLanding data={data?.TESTIMONIALS} />
       <ContactSection data={data?.CONTACTUS} />
-      <Footer data={data?.FOOTER} />
+      <Footer
+        data={data?.FOOTER}
+        socialLinks={
+          headerContent?.info?.socials &&
+          Array.isArray(headerContent.info.socials)
+            ? headerContent?.info?.socials
+            : []
+        }
+      />
     </main>
   );
 }

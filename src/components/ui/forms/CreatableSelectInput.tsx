@@ -51,7 +51,13 @@ export default function CreatableSelectInput({
               field.onChange(selected?.value);
             }}
             value={
-              options.find((option) => option.value === field.value) || null
+              options.find((option) => option.value === field.value) ||
+              field.value
+                ? {
+                    label: field.value,
+                    value: field.value,
+                  }
+                : null
             }
             classNamePrefix="react-select"
             styles={{

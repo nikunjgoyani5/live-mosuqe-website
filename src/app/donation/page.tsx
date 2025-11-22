@@ -3,27 +3,29 @@ import FoundersVision from "@/components/landing-wrapper/_components/aboutPage/F
 import Empowering from "@/components/landing-wrapper/_components/aboutPage/Empowering";
 // import Header from "@/components/landing-wrapper/_components/header";
 import Footer from "@/components/landing-wrapper/_components/footer";
-import { ISections, SECTION_DATA_MAPING, IHeaderContent } from "@/constants/section.constants";
+import {
+  ISections,
+  SECTION_DATA_MAPING,
+  IHeaderContent,
+} from "@/constants/section.constants";
 import { getSectionsList } from "@/services/section.service";
+import Donation from "@/components/landing-wrapper/_components/donationPage/Donation";
 
-export default async function AboutUsPage() {
+export default async function DonationPage() {
   const data: ISections | null = await getSectionsList();
   if (!data) return null;
 
-  const aboutIntro = data[SECTION_DATA_MAPING.ABOUTUSPAGE];
-  const founderVision = data[SECTION_DATA_MAPING.FOUNDERVISION];
-  const empowering = data[SECTION_DATA_MAPING.EMPOWERING];
+  const aboutIntro = data[SECTION_DATA_MAPING.DONATION];
 
   return (
     <main>
-      {/* <Header data={data[SECTION_DATA_MAPING.HEADER]} /> */}
-
-      <AboutIntro data={aboutIntro} />
-      <FoundersVision data={founderVision} />
-      <Empowering data={empowering} />
+      <Donation data={aboutIntro} />
       <Footer
         data={data[SECTION_DATA_MAPING.FOOTER]}
-        socialLinks={(data[SECTION_DATA_MAPING.HEADER]?.content as IHeaderContent)?.info?.socials || []}
+        socialLinks={
+          (data[SECTION_DATA_MAPING.HEADER]?.content as IHeaderContent)?.info
+            ?.socials || []
+        }
       />
     </main>
   );

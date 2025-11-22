@@ -12,13 +12,14 @@ import SectionWrapper from "../_components/sectionWrapper";
 import TextareaField from "@/components/ui/forms/TextareaField";
 import DownloadVariantsForm from "./download-variants-form";
 import ProductVariantsForm from "./product-variants-form";
+import ImageUploadField from "../_components/ImageUploadField";
 
 interface IProps {
   data: ISection;
 }
 
 export default function ProductsSection({ data }: IProps) {
-  const { content, _id: sectionId, name } = data;
+  const { content, _id: sectionId, name, visible } = data;
   const {
     handleSubmit,
     formData,
@@ -39,10 +40,11 @@ export default function ProductsSection({ data }: IProps) {
     Object.keys(formData.content?.imagesData || {}).length || 0;
   const uploadMediaCount = Object.keys(uploadMedia)?.length;
   const markDeletedMediaCount = Object.keys(markDeletedMedia)?.length;
+  // @ts-ignore
 
   const addCount = uploadedCount + uploadMediaCount - markDeletedMediaCount;
   return (
-    <SectionWrapper sectionId={sectionId} title={name}>
+    <SectionWrapper sectionId={sectionId} title={name} visible={visible}>
       <FormProvider
         onSubmit={(value) => {
           handleSubmit({
@@ -51,6 +53,10 @@ export default function ProductsSection({ data }: IProps) {
               ...value.content,
               //@ts-ignore
               imagesData: { ...formData.content?.imagesData },
+              //@ts-ignore
+              modalImages: { ...formData.content?.modalImages },
+              //@ts-ignore
+              media_url: formData.content?.media_url,
             },
           });
         }}
@@ -142,14 +148,36 @@ export default function ProductsSection({ data }: IProps) {
               </div>
             ) : (
               // 3️⃣ Nothing there yet → show Dropzone
-              <Dropzone
+              // <Dropzone
+              //   name="content.media_url"
+              //   files={{}}
+              //   onAddFile={addUploadMedia}
+              //   onDeleteFile={(key, path) => {
+              //     markDeletedMedia(key, path);
+              //   }}
+              //   existingFiles={[]}
+              // />
+              <ImageUploadField
                 name="content.media_url"
                 files={{}}
-                onAddFile={addUploadMedia}
+                uploadMedia={uploadMedia}
+                existingImagePath={null}
+                addUploadMedia={addUploadMedia}
                 onDeleteFile={(key, path) => {
                   markDeletedMedia(key, path);
+                  handleOnChange(key, "");
                 }}
+                aspectRatio="w-full h-[300] sm:h-[400] lg:h-[537px] min-w-[800px] object-cover rounded"
                 existingFiles={[]}
+                markDeletedMedia={function (
+                  name: string,
+                  pathToDelete: string
+                ): void {
+                  markDeletedMedia(name, pathToDelete);
+                }}
+                variant="image"
+                targetHeight={944}
+                targetWidth={823}
               />
             )}
 
@@ -160,7 +188,7 @@ export default function ProductsSection({ data }: IProps) {
                   )?.map(
                     ([key, val], i) =>
                       val && (
-                        <div className="relative">
+                        <div key={val + i} className="relative">
                           {!isVideo(val) ? (
                             <Image
                               src={`${BASE_URL}${val}`}
@@ -244,20 +272,31 @@ export default function ProductsSection({ data }: IProps) {
                   )
                 : null}
               {/* // 3️⃣ Nothing there yet → show Dropzone */}
-              <div className="w-[250] h-[100] sm:h-[100] lg:h-[100] object-cover rounded">
-                <Dropzone
+              <div className="h-[100] sm:h-[100] lg:h-[100] object-cover rounded">
+                <ImageUploadField
                   name={`content.imagesData.Image${
                     addCount < 0 ? 0 : addCount
                   }`}
                   files={{}}
-                  variant="image"
-                  onAddFile={addUploadMedia}
+                  uploadMedia={uploadMedia}
+                  existingImagePath={null}
+                  addUploadMedia={addUploadMedia}
                   onDeleteFile={(key, path) => {
                     markDeletedMedia(key, path);
+                    handleOnChange(key, "");
                   }}
+                  aspectRatio="!w-[100] !h-[100] min-h-[100] max-h-[100] min-w-[100] max-w-[100] bg-[#EDF0F2] border-solid"
                   existingFiles={[]}
+                  markDeletedMedia={function (
+                    name: string,
+                    pathToDelete: string
+                  ): void {
+                    markDeletedMedia(name, pathToDelete);
+                  }}
                   onlyIcon
-                  className="!w-[100] !h-[100] min-h-[100] max-h-[100] min-w-[100] max-w-[100] bg-[#EDF0F2] border-solid"
+                  variant="image"
+                  targetHeight={700}
+                  targetWidth={700}
                 />
               </div>
             </div>
@@ -269,7 +308,7 @@ export default function ProductsSection({ data }: IProps) {
                   )?.map(
                     ([key, val], i) =>
                       val && (
-                        <div className="relative">
+                        <div key={val + i} className="relative">
                           {!isVideo(val) ? (
                             <Image
                               src={`${BASE_URL}${val}`}
@@ -353,8 +392,8 @@ export default function ProductsSection({ data }: IProps) {
                   )
                 : null}
               {/* // 3️⃣ Nothing there yet → show Dropzone */}
-              <div className="w-[250] h-[100] sm:h-[100] lg:h-[100] object-cover rounded">
-                <Dropzone
+              <div className=" h-[100] sm:h-[100] lg:h-[100] object-cover rounded">
+                {/* <Dropzone
                   name={`content.modalImages.Image${
                     addCount < 0 ? 0 : addCount
                   }`}
@@ -367,6 +406,31 @@ export default function ProductsSection({ data }: IProps) {
                   existingFiles={[]}
                   onlyIcon
                   className="!w-[100] !h-[100] min-h-[100] max-h-[100] min-w-[100] max-w-[100] bg-[#EDF0F2] border-solid"
+                /> */}
+                <ImageUploadField
+                  name={`content.modalImages.Image${
+                    addCount < 0 ? 0 : addCount
+                  }`}
+                  files={{}}
+                  uploadMedia={uploadMedia}
+                  existingImagePath={null}
+                  addUploadMedia={addUploadMedia}
+                  onDeleteFile={(key, path) => {
+                    markDeletedMedia(key, path);
+                    handleOnChange(key, "");
+                  }}
+                  aspectRatio="!w-[100] !h-[100] min-h-[100] max-h-[100] min-w-[100] max-w-[100] bg-[#EDF0F2] border-solid"
+                  existingFiles={[]}
+                  markDeletedMedia={function (
+                    name: string,
+                    pathToDelete: string
+                  ): void {
+                    markDeletedMedia(name, pathToDelete);
+                  }}
+                  onlyIcon
+                  variant="image"
+                  targetHeight={700}
+                  targetWidth={700}
                 />
               </div>
             </div>

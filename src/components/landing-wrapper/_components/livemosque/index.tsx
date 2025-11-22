@@ -3,85 +3,30 @@ import LiveMosqueCard from "@/components/liveMosqueCard";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ISection, IServicesContent } from "@/constants/section.constants";
+import { getFullImageUrl } from "@/lib/utils";
+import { ImageOff } from "lucide-react";
 
 interface IProps {
   data?: ISection;
 }
 export default function LiveMosqueSection({ data }: IProps) {
+  if (!data?.visible) return null;
   // How far above the top cards the connector lines should extend (in px)
   const DESIRED_ABOVE_TOP_ANCHOR = 280;
   // Dynamic SVG offset computed from layout
-  const [svgTopOffset, setSvgTopOffset] = useState<number>(DESIRED_ABOVE_TOP_ANCHOR);
+  const [svgTopOffset, setSvgTopOffset] = useState<number>(
+    DESIRED_ABOVE_TOP_ANCHOR
+  );
 
   // Extract services content or fallback to dummy data
   const servicesContent = data?.content as unknown as IServicesContent;
   const sectionTitle = servicesContent?.title || "LIVE MOSQUE";
-  const sectionSubtitle = servicesContent?.subtitle || "Stay connected with your community";
-
-  // Fallback static features for when no dynamic data is available
-  const fallbackFeatures = [
-    {
-      title: "IN MASJID DISPLAYS",
-      subtitle: "Masjid Clock Displays and use our masjid clock picture",
-      image: "/masjid-display.png",
-    },
-    {
-      title: "PHONE APP",
-      subtitle: "End user app and our app picture",
-      image: "/phone-app.png",
-    },
-    {
-      title: "HOME CLOCK",
-      subtitle: "This is a Muslim prayer and Iqamah time clock that…",
-      image: "/home-clock.png",
-    },
-    {
-      title: "LIVE MOSQUE",
-      subtitle: "Imam Admin App",
-      image: "/imam-admin.png",
-    },
-    {
-      title: "DONATIONS",
-      subtitle: "Raise more with multiple donation options",
-      image: "/donations.png",
-    },
-  ];
-
-  // Ensure we always have a valid features array with fallbacks
-  const rawFeatures = servicesContent?.data || [];
-
-  // Create a features array that always has exactly 5 elements
-  const features = fallbackFeatures.map((fallback, index) => {
-    const apiFeature = Array.isArray(rawFeatures) && rawFeatures[index] ? rawFeatures[index] : null;
-
-    if (apiFeature && typeof apiFeature === 'object') {
-      const merged = {
-        ...fallback,
-        ...apiFeature,
-        // Ensure critical properties always exist
-        title: apiFeature.title || fallback.title,
-        subtitle: apiFeature.subtitle || fallback.subtitle,
-        image: apiFeature.image || fallback.image
-      };
-
-      // Debug logging for development
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`Feature ${index}:`, merged);
-      }
-
-      return merged;
-    }
-
-    return fallback;
-  });
-
-  // Additional safety check to ensure all features have subtitles
-  features.forEach((feature, index) => {
-    if (!feature || !feature.subtitle) {
-      console.warn(`Feature ${index} missing subtitle, using fallback`);
-      features[index] = { ...fallbackFeatures[index] };
-    }
-  });
+  const sectionSubtitle =
+    servicesContent?.subtitle || "Stay connected with your community";
+  const features = (servicesContent?.data || []).map((feature) => ({
+    ...feature,
+    image: feature.image ? getFullImageUrl(feature.image) : undefined,
+  }));
 
   // Refs for anchors above each card (desktop only usage)
   const leftTopRef = useRef<HTMLDivElement>(null);
@@ -113,7 +58,6 @@ export default function LiveMosqueSection({ data }: IProps) {
       };
     };
 
-
     const lTop = getCenter(leftTopRef.current);
     const lMid = getCenter(leftMidRef.current);
     const rTop = getCenter(rightTopRef.current);
@@ -127,10 +71,12 @@ export default function LiveMosqueSection({ data }: IProps) {
     const containerTop = 0; // 0 in SVG space maps to -svgTopOffset relative to the wrapper
 
     // Straight vertical dashed lines (extended from top of section to mid cards)
-    const verticalLeft = `M ${lTop.x} ${containerTop} L ${lMid.x} ${fy(lMid.y)}`;
-    const verticalRight = `M ${rTop.x} ${containerTop} L ${rMid.x} ${fy(rMid.y)}`;
-
-
+    const verticalLeft = `M ${lTop.x} ${containerTop} L ${lMid.x} ${fy(
+      lMid.y
+    )}`;
+    const verticalRight = `M ${rTop.x} ${containerTop} L ${rMid.x} ${fy(
+      rMid.y
+    )}`;
 
     // New path style: vertical down from mid cards, small rounded corner into horizontal baseline,
     // then gentle upward curve into center bottom card (matching provided design with right-angle + curve feel)
@@ -148,7 +94,8 @@ export default function LiveMosqueSection({ data }: IProps) {
       `M ${lMid.x} ${fy(lMid.y)}`,
       `L ${lMid.x} ${fy(leftVerticalEnd)}`,
       // Corner (cubic approximating quarter circle)
-      `C ${lMid.x} ${fy(leftVerticalEnd + cornerR * 0.5)}, ${lMid.x + cornerR * 0.5
+      `C ${lMid.x} ${fy(leftVerticalEnd + cornerR * 0.5)}, ${
+        lMid.x + cornerR * 0.5
       } ${fy(adjustedBaselineY)}, ${leftCornerEndX} ${fy(adjustedBaselineY)}`,
       // Horizontal run towards center (stop before upward curve start)
       `L ${center.x - upDiff} ${fy(adjustedBaselineY)}`,
@@ -162,7 +109,8 @@ export default function LiveMosqueSection({ data }: IProps) {
     const bottomRight = [
       `M ${rMid.x} ${fy(rMid.y)}`,
       `L ${rMid.x} ${fy(rightVerticalEnd)}`,
-      `C ${rMid.x} ${fy(rightVerticalEnd + cornerR * 0.5)}, ${rMid.x - cornerR * 0.5
+      `C ${rMid.x} ${fy(rightVerticalEnd + cornerR * 0.5)}, ${
+        rMid.x - cornerR * 0.5
       } ${fy(adjustedBaselineY)}, ${rightCornerEndX} ${fy(adjustedBaselineY)}`,
       `L ${center.x + upDiff} ${fy(adjustedBaselineY)}`,
       `Q ${center.x} ${fy(adjustedBaselineY)}, ${center.x} ${fy(center.y)}`,
@@ -201,7 +149,10 @@ export default function LiveMosqueSection({ data }: IProps) {
   }, []);
 
   return (
-    <section id="services" className="scroll-section relative w-full overflow-hidden pt-10 sm:pt-14 md:pt-16 pb-4 sm:pb-6 md:pb-20">
+    <section
+      id="services"
+      className="scroll-section relative w-full overflow-hidden pt-10 sm:pt-14 md:pt-16 pb-4 sm:pb-6 md:pb-20"
+    >
       {/* Background image full bleed anchored to bottom without cropping */}
       <div
         className="pointer-events-none absolute inset-0"
@@ -209,7 +160,10 @@ export default function LiveMosqueSection({ data }: IProps) {
           backgroundImage: "url('/live_mosque_pattern.png')",
           backgroundRepeat: "no-repeat",
           backgroundPosition: "bottom center",
-          backgroundSize: "100% auto",
+          backgroundSize:
+            typeof window !== "undefined" && window.innerWidth > 2132
+              ? "inherit"
+              : "100% auto",
         }}
         aria-hidden="true"
       />
@@ -226,7 +180,9 @@ export default function LiveMosqueSection({ data }: IProps) {
               height={40}
             />
           </p>
-          <p className="body-description font-montserrat text-dark-100 mb-1">{sectionSubtitle}</p>
+          <p className="body-description font-montserrat text-dark-100 mb-1">
+            {sectionSubtitle}
+          </p>
           <h2 className="text-primary-color font-cinzel flex flex-col items-center gap-2 section-name-heading-responsive">
             <span>{sectionTitle}</span>
           </h2>
@@ -244,19 +200,49 @@ export default function LiveMosqueSection({ data }: IProps) {
                 src="/logo.png"
                 alt="Live Mosque Icon"
                 className="w-28 h-28 rounded-xl "
-                width={112}
-                height={112}
+                width={500}
+                height={500}
               />
             </div>
           </div>
 
           {/* Cards Layout */}
           <div className="relative z-10 grid grid-cols-2 justify-between w-full gap-y-16 container-1024 sm:px-6 lg:px-0 ">
-            <div className="flex justify-start"><LiveMosqueCard {...features[0]} description={features[0]?.subtitle} anchorRef={leftTopRef} /></div>
-            <div className="flex justify-end"><LiveMosqueCard {...features[1]} description={features[1]?.subtitle} anchorRef={rightTopRef} /></div>
-            <div className="flex justify-start"><LiveMosqueCard {...features[2]} description={features[2]?.subtitle} anchorRef={leftMidRef} /></div>
-            <div className="flex justify-end"><LiveMosqueCard {...features[4]} description={features[4]?.subtitle} anchorRef={rightMidRef} /></div>
-            <div className="col-span-2 flex justify-center"><LiveMosqueCard {...features[3]} description={features[3]?.subtitle} anchorRef={centerBottomRef} /></div>
+            <div className="flex justify-start">
+              <LiveMosqueCard
+                {...features[0]}
+                description={features[0]?.subtitle}
+                anchorRef={leftTopRef}
+              />
+            </div>
+            <div className="flex justify-end">
+              <LiveMosqueCard
+                {...features[1]}
+                description={features[1]?.subtitle}
+                anchorRef={rightTopRef}
+              />
+            </div>
+            <div className="flex justify-start">
+              <LiveMosqueCard
+                {...features[2]}
+                description={features[2]?.subtitle}
+                anchorRef={leftMidRef}
+              />
+            </div>
+            <div className="flex justify-end">
+              <LiveMosqueCard
+                {...features[4]}
+                description={features[4]?.subtitle}
+                anchorRef={rightMidRef}
+              />
+            </div>
+            <div className="col-span-2 flex justify-center">
+              <LiveMosqueCard
+                {...features[3]}
+                description={features[3]?.subtitle}
+                anchorRef={centerBottomRef}
+              />
+            </div>
           </div>
 
           {/* Connector SVG */}

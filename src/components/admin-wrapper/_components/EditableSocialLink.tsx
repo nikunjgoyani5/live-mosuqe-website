@@ -74,13 +74,7 @@ export default function EditableSocialIcons() {
         const isEditing = editingSocialName === field.id;
 
         return (
-          <div
-            key={field.id}
-            className="relative"
-            onClick={() => {
-              console.log("Clicked");
-            }}
-          >
+          <div key={field.id} className="relative" onClick={() => {}}>
             {/* The Icon that toggles editing mode */}
             <div
               onClick={() => {

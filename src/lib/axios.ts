@@ -6,7 +6,8 @@ function normalizeBase(url: string) {
   return url.trim().replace(/\/$/, "");
 }
 
-const RAW_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const RAW_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://api.livemosque.live";
 export const BASE_URL = normalizeBase(RAW_BASE_URL);
 
 export const api = axios.create({
@@ -32,7 +33,8 @@ api.interceptors.response.use(
     if (error?.config) {
       const { method, url, baseURL } = error.config;
       console.error(
-        `[API ${method?.toUpperCase()}] ${baseURL || ""}${url || ""} -> ${error?.response?.status || error.code || "ERR"
+        `[API ${method?.toUpperCase()}] ${baseURL || ""}${url || ""} -> ${
+          error?.response?.status || error.code || "ERR"
         }`
       );
     }

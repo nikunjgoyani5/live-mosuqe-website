@@ -4,12 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { DateBadge } from "@/components/ui/DateBadge";
-import { CalanderIcon, ClockIcon, FacebookIcon, InstagramIcon, LinkedInIcon, TwitterIcon } from "@/constants/icons";
+import { CalanderIcon, ClockIcon, FacebookIcon, InstagramIcon, LinkedInIcon, NoImageIcon, TwitterIcon } from "@/constants/icons";
 import { useParams, useRouter } from "next/navigation";
+import { ImageOff } from "lucide-react";
 import { getSectionsList } from "@/services/section.service";
 import { ISections } from "@/constants/section.constants";
-import { BASE_URL } from "@/lib/axios";
-import Header from "@/components/landing-wrapper/_components/header";
+import { getFullImageUrl } from "@/lib/utils";
+import Loader from "@/components/ui/Loader";
 import type { ISection } from "@/constants/section.constants";
 
 type TNews = {
@@ -30,7 +31,7 @@ type TNews = {
 export default function SingleNewsPage() {
     const params = useParams();
     const router = useRouter();
-    const idNum = Number(params?.id);
+    const indexNum = Number(params?.id);
 
     const [posts, setPosts] = useState<TNews[]>([]);
     const [headerData, setHeaderData] = useState<ISection | undefined>(undefined);
@@ -38,9 +39,8 @@ export default function SingleNewsPage() {
 
     useEffect(() => {
         const normalizeImage = (src?: string) => {
-            if (!src) return "/serviceside2.png";
-            if (src.startsWith("/uploads/")) return `${BASE_URL}${src}`;
-            return src;
+            // if (!src) return "/serviceside2.png";
+            return getFullImageUrl(src || "");
         };
         getSectionsList()
             .then((sections: ISections | null) => {
@@ -58,8 +58,8 @@ export default function SingleNewsPage() {
                     rating: it.rating || "",
                     text: it.text || "",
                     content: it.content || it.subtitle || "",
-                    id: it.id || it._id || idx + 1,
-                    href: `/news/${it.id || it._id || idx + 1}`,
+                    id: idx + 1,
+                    href: `/news/${idx + 1}`,
                 }));
                 setPosts(mapped);
             })
@@ -67,20 +67,25 @@ export default function SingleNewsPage() {
             .finally(() => setIsLoading(false));
     }, []);
 
-    const current = useMemo(() => posts.find((p) => Number(p.id) === idNum), [posts, idNum]);
+    const current = useMemo(() => posts[indexNum - 1], [posts, indexNum]);
 
     // Sidebar search over all posts
     const [query, setQuery] = useState("");
     const recent = useMemo(() => {
         const q = query.trim().toLowerCase();
-        const list = posts.slice().reverse();
-        if (!q) return list.slice(0, 4);
-        return list
+        // Take last 4 items by index (newest database entries) and reverse to show newest first
+        const recentByIndex = posts.slice(-4).reverse();
+        if (!q) return recentByIndex;
+        return recentByIndex
             .filter((p) => [p.title, p.subtitle].some((t) => t.toLowerCase().includes(q)))
             .slice(0, 4);
     }, [query, posts]);
 
-    if (!current && !isLoading) {
+    if (isLoading) {
+        return <Loader />;
+    }
+
+    if (!current) {
         return (
             <div className="min-h-screen bg-[#F4F4F4] flex items-center justify-center p-6">
                 <div className="text-center">
@@ -134,7 +139,13 @@ export default function SingleNewsPage() {
                     <article className="lg:col-span-2">
                         <div className="rounded-2xl overflow-hidden ">
                             <div className="relative h-[220px] sm:h-[320px] md:h-[380px] w-full">
-                                <Image src={current?.image || "/serviceside2.png"} alt={current?.title || "News image"} fill className="object-cover rounded-2xl overflow-hidden" />
+                                {current?.image ? (
+                                    <Image src={current.image} alt={current?.title || "News image"} fill className="object-cover rounded-2xl overflow-hidden" />
+                                ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center bg-gray-200 rounded-2xl">
+                                        <ImageOff className="w-12 h-12 text-gray-400" />
+                                    </div>
+                                )}
                             </div>
                             <div className="p-4 sm:p-6">
                                 <h2 className="font-cinzel-decorative text-primary-color text-xl sm:text-2xl md:text-3xl font-semibold leading-snug">
@@ -150,20 +161,20 @@ export default function SingleNewsPage() {
                                                 <span><CalanderIcon /></span>
                                                 <span className="text-sm font-medium">{current?.postdate}</span>
                                             </div>
-                                            <div className="flex items-center gap-1">
+                                            {/* <div className="flex items-center gap-1">
                                                 <span><ClockIcon /></span>
                                                 {current?.posttime ? (
                                                     <span className="text-sm font-medium">{current.posttime}</span>
                                                 ) : null}
-                                            </div>
+                                            </div> */}
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-4 text-gray-600 ">
+                                    {/* <div className="flex items-center gap-4 text-gray-600 ">
                                         <a aria-label="Share on Facebook" href="#" className="hover:opacity-80"><FacebookIcon /></a>
                                         <a aria-label="Share on Instagram" href="#" className="hover:opacity-80"><InstagramIcon /></a>
                                         <a aria-label="Share on LinkedIn" href="#" className="hover:opacity-80"><LinkedInIcon /></a>
                                         <a aria-label="Share on Twitter" href="#" className="hover:opacity-80"><TwitterIcon /></a>
-                                    </div>
+                                    </div> */}
                                 </div>
 
                                 {/* Content */}
@@ -174,7 +185,7 @@ export default function SingleNewsPage() {
                                         .map((para) => para.trim())
                                         .filter(Boolean)
                                         .map((para, idx) => (
-                                            <p key={idx} className="mb-3 whitespace-pre-wrap body-description">
+                                            <p key={idx} className="mb-3 whitespace-pre-wrap body-description text-justify">
                                                 {para}
                                             </p>
                                         ))}
@@ -204,32 +215,54 @@ export default function SingleNewsPage() {
                             </h3>
 
                             <div className="flex flex-col gap-3">
-                                {recent.slice(0, 4).map((item, idx) => (
-                                    <article
-                                        key={idx}
-                                        className="border border-card/90 rounded-2xl p-4 flex gap-3 items-start "
-                                    >
-                                        <div className="relative h-28 w-22 lg:h-42 lg:w-32 overflow-hidden rounded-xl shrink-0">
-                                            <Image
-                                                src={item.image || "/serviceside2.png"}
-                                                alt={item.title}
-                                                fill
-                                                className="object-cover"
-                                            />
+                                {recent.length > 0 ?
+                                    (Array.isArray(recent) && recent.slice(0, 4).map((item, idx) => (
+                                        <article
+                                            key={idx}
+                                            className="border border-card/90 rounded-2xl p-4 flex gap-3 items-start "
+                                        >
+                                            <div className="relative h-28 w-22 lg:h-42 lg:w-32 overflow-hidden rounded-xl shrink-0">
+                                                {item.image ? (
+                                                    <Image
+                                                        src={item.image}
+                                                        alt={item.title}
+                                                        fill
+                                                        className="object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="absolute inset-0 flex items-center justify-center bg-gray-200">
+                                                        <ImageOff className="w-6 h-6 text-gray-400" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <h4 className="text-sm font-semibold text-primary-color uppercase tracking-wide line-clamp-1">
+                                                    {item.title}
+                                                </h4>
+                                                <p className="mt-1 text-xs sm:text-sm font-medium text-gray-700 leading-relaxed break-words line-clamp-3">
+                                                    {item.subtitle}
+                                                </p>
+                                                <DateBadge variant="primary" className="mt-2 inline-block">
+                                                    {item.postdate}
+                                                </DateBadge>
+                                            </div>
+                                        </article>
+                                    ))
+                                    )
+                                    :
+                                    <article className="grid grid-cols-[130px_1fr] sm:grid-cols-[160px_1fr] md:grid-cols-[160px_1fr] gap-3 rounded-xl border bg-card/60 p-4 h-full overflow-hidden min-h-[220px] sm:min-h-[240px] md:min-h-[170px] lg:min-h-[150px]">
+                                        {/* Placeholder image */}
+                                        <div className="relative overflow-hidden rounded-lg bg-gray-200 flex items-center justify-center">
+                                            <NoImageIcon />
                                         </div>
-                                        <div className="min-w-0">
-                                            <h4 className="text-sm font-semibold text-primary-color uppercase tracking-wide line-clamp-1">
-                                                {item.title}
+                                        {/* Centered message */}
+                                        <div className="flex items-center justify-center text-center">
+                                            <h4 className="text-base sm:text-lg md:text-xl font-semibold text-primary-color">
+                                                No data found
                                             </h4>
-                                            <p className="mt-1 text-xs sm:text-sm font-medium text-gray-700 leading-relaxed break-words line-clamp-3">
-                                                {item.subtitle}
-                                            </p>
-                                            <DateBadge variant="primary" className="mt-2 inline-block">
-                                                {item.postdate}
-                                            </DateBadge>
                                         </div>
                                     </article>
-                                ))}
+                                }
                             </div>
                         </div>
                     </aside>

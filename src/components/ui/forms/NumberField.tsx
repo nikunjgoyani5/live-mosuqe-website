@@ -25,8 +25,9 @@ export default function NumberField({
   return (
     <div className={`flex flex-col gap-2 ${className ?? ""}`.trim()}>
       {label ? (
-        <label htmlFor={name} className="text-dark-100 font-medium">
+        <label htmlFor={name} className="text-dark-100 line-clamp-1 max-w-[35ch] font-medium">
           {label}
+          {required ? <span className="text-red-500 ml-1">*</span> : null}
         </label>
       ) : null}
       <input
@@ -37,7 +38,7 @@ export default function NumberField({
         aria-invalid={!!err}
         suppressHydrationWarning={true}
         {...register(name, { valueAsNumber: true })}
-        required={required}
+      // Do not pass native required to avoid browser tooltip
       />
       {err ? <p className="text-red-500 text-xs">{err}</p> : null}
     </div>

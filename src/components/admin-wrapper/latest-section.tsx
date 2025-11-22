@@ -70,9 +70,12 @@ const MenuItems = ({
   };
 
   const showNewEdit = (index: number) => (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-5">
+    <div
+      key={index}
+      className="flex flex-col lg:flex-row md:grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-5"
+    >
       <div>{imageUpload(index, uploadMedia)}</div>
-      <div className="lg:col-span-2 space-y-4">
+      <div className="lg:col-span-2 space-y-4 flex-1">
         <TextInput name={`content.data.${index}.title`} label="Title" />
         {/* <TextInput name={`content.data.${index}.read_more`} label="Read More" /> */}
         <div className="lg:col-span-2">
@@ -115,8 +118,8 @@ const MenuItems = ({
                 <Image
                   src={`${BASE_URL}${item.image}`}
                   alt={item.title}
-                  width={150}
-                  height={150}
+                  width={145}
+                  height={155}
                   className="w-24 h-24 min-w-24 min-h-24 object-cover rounded"
                 />
               ) : (
@@ -157,7 +160,13 @@ const MenuItems = ({
 };
 
 export default function LatestNewsSection({ data }: IProps) {
-  const { content, _id: sectionId, name, refetch } = useSectionData(data);
+  const {
+    content,
+    _id: sectionId,
+    name,
+    refetch,
+    visible,
+  } = useSectionData(data);
   const [deletedCards, setDeletedCards] = useState<string[]>([]);
   const {
     handleSubmit,
@@ -199,16 +208,15 @@ export default function LatestNewsSection({ data }: IProps) {
         existingImagePath={existingPath}
         addUploadMedia={addUploadMedia}
         markDeletedMedia={markDeletedMedia}
-        aspectRatio="w-full h-[300] sm:h-[400] lg:h-[500] object-cover rounded"
+        aspectRatio="w-full sm:min-w-[645px] h-[150] sm:h-[555] lg:h-[555] object-cover rounded"
         files={{}}
         onDeleteFile={markDeletedMedia}
+        targetHeight={555}
+        targetWidth={645}
+        skipTool={true}
       />
     );
   };
-
-  useEffect(() => {
-    console.log("uploadMedia updated", uploadMedia);
-  }, [uploadMedia]);
 
   return (
     <SectionWrapper
@@ -216,13 +224,20 @@ export default function LatestNewsSection({ data }: IProps) {
       title={name}
       addButton
       onAdd={addItem}
+      visible={visible}
     >
       <FormProvider
         onSubmit={(values) => {
           const newData = [
             //@ts-ignore
-            ...content?.data,
+            ...values?.content?.data,
           ].filter((val) => !deletedCards.includes(val.id));
+          //@ts-ignore
+          formData.content?.data?.forEach((value) => {
+            const dataIndex = newData.findIndex((val) => val.id === value.id);
+            if (dataIndex !== -1) newData[dataIndex].image = value.image;
+          });
+
           handleSubmit({ content: { ...content, data: newData } });
         }}
         options={{

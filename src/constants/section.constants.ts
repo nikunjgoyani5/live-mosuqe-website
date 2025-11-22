@@ -28,6 +28,7 @@ export const SECTION_DATA_MAPING = {
   ABOUTUSPAGE: "ABOUTUSPAGE",
   FOUNDERVISION: "FOUNDERVISION",
   EMPOWERING: "EMPOWERING",
+  DONATION: "DONATION",
 } as const;
 
 // Extract union of keys ("HEADER" | "HERO_BANNER" | ...)
@@ -77,9 +78,11 @@ export interface IProductContent {
   title: string;
   description: string;
   images: string[];
+  modalImages: any;
   media_type: string;
   media_url: string;
   "readmore "?: string;
+  imagesData: any;
 }
 
 export interface ITestimonialItem {

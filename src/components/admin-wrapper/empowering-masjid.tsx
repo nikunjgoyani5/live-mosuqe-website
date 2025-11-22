@@ -10,13 +10,14 @@ import Image from "next/image";
 import { ISection } from "@/constants/section.constants";
 import TextareaField from "@/components/ui/forms/TextareaField";
 import SectionWrapper from "./_components/sectionWrapper";
+import ImageUploadField from "./_components/ImageUploadField";
 
 interface IProps {
   data: ISection;
 }
 
 export default function EmpowerMasjidSection({ data }: IProps) {
-  const { content, _id: sectionId, name } = data;
+  const { content, _id: sectionId, name, visible } = data;
   const {
     handleSubmit,
     formData,
@@ -40,7 +41,7 @@ export default function EmpowerMasjidSection({ data }: IProps) {
 
   const addCount = uploadedCount + uploadMediaCount - markDeletedMediaCount;
   return (
-    <SectionWrapper sectionId={sectionId} title={name}>
+    <SectionWrapper sectionId={sectionId} title={name} visible={visible}>
       <FormProvider
         onSubmit={(value) => {
           handleSubmit({
@@ -49,6 +50,8 @@ export default function EmpowerMasjidSection({ data }: IProps) {
               ...value.content,
               //@ts-ignore
               imagesData: { ...formData.content?.imagesData },
+              //@ts-ignore
+              media_url: formData.content?.media_url,
             },
           });
         }}
@@ -140,14 +143,23 @@ export default function EmpowerMasjidSection({ data }: IProps) {
               </div>
             ) : (
               // 3️⃣ Nothing there yet → show Dropzone
-              <Dropzone
+              <ImageUploadField
                 name="content.media_url"
                 files={{}}
-                onAddFile={addUploadMedia}
+                uploadMedia={{}}
+                existingImagePath={null}
+                addUploadMedia={addUploadMedia}
                 onDeleteFile={(key, path) => {
                   markDeletedMedia(key, path);
+                  handleOnChange(key, "");
                 }}
                 existingFiles={[]}
+                markDeletedMedia={function (
+                  name: string,
+                  pathToDelete: string
+                ): void {
+                  markDeletedMedia(name, pathToDelete);
+                }}
               />
             )}
           </div>

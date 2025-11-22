@@ -13,7 +13,7 @@ interface IProps {
 }
 
 export default function ContactSection({ data }: IProps) {
-  const { content, _id: sectionId, name } = data;
+  const { content, _id: sectionId, name, visible } = data;
   const { handleSubmit, formData, loading } = useSection(
     {
       content: content,
@@ -22,7 +22,7 @@ export default function ContactSection({ data }: IProps) {
   );
 
   return (
-    <SectionWrapper sectionId={sectionId} title={name}>
+    <SectionWrapper sectionId={sectionId} title={name} visible={visible}>
       <FormProvider
         onSubmit={handleSubmit}
         options={{
