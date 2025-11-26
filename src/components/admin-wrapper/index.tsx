@@ -59,7 +59,7 @@ export default function AdminWrapper({ data }: IProps) {
           Home Page
         </button>
         <button
-          className={`px-4 py-2 cursor-pointer ${
+          className={`px-4 py-2 rounded-r-lg cursor-pointer ${
             activeTab === "about"
               ? "bg-primary-color text-white"
               : "bg-gray-200"
@@ -67,16 +67,6 @@ export default function AdminWrapper({ data }: IProps) {
           onClick={() => setActiveTab("about")}
         >
           About Page
-        </button>
-        <button
-          className={`px-4 py-2 rounded-r-lg cursor-pointer ${
-            activeTab === "donation"
-              ? "bg-primary-color text-white"
-              : "bg-gray-200"
-          }`}
-          onClick={() => setActiveTab("donation")}
-        >
-          Donation
         </button>
       </div>
       {activeTab === "home" && (
@@ -90,8 +80,9 @@ export default function AdminWrapper({ data }: IProps) {
           <ServicesSection data={data[SECTION_DATA_MAPING.SERVICES]} />
           <AboutSection data={data[SECTION_DATA_MAPING.ABOUTUS]} />
           {data[SECTION_DATA_MAPING.PRODUCTS].map((val, i) => (
-            <ProductsSection data={val} key={val?._id} />
+            <ProductsSection data={val} key={val?._id} productIndex={i} />
           ))}
+          <DonationPageSection data={data[SECTION_DATA_MAPING.DONATION]} />
           <TestimonialsSection data={data[SECTION_DATA_MAPING.TESTIMONIALS]} />
           <ContactSection data={data[SECTION_DATA_MAPING.CONTACTUS]} />
           <FooterSection
@@ -108,12 +99,6 @@ export default function AdminWrapper({ data }: IProps) {
             data={data[SECTION_DATA_MAPING.FOUNDERVISION]}
           />
           <EmpowerMasjidSection data={data[SECTION_DATA_MAPING.EMPOWERING]} />
-        </>
-      )}
-
-      {activeTab === "donation" && (
-        <>
-          <DonationPageSection data={data[SECTION_DATA_MAPING.DONATION]} />
         </>
       )}
     </div>

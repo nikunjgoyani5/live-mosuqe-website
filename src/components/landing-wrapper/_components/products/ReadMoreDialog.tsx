@@ -126,7 +126,7 @@ export const ReadMoreDialog: React.FC<Props> = ({
                               src={image}
                               alt={`${title} - Image ${index + 1}`}
                               fill
-                              className="object-cover w-full h-full"
+                              className="object-contain w-full h-full"
                               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
                               priority={index === 0}
                             />
@@ -177,7 +177,7 @@ export const ReadMoreDialog: React.FC<Props> = ({
                             src={thumb}
                             alt={`Thumbnail ${index + 1}`}
                             fill
-                            className="object-cover"
+                            className="object-contain"
                             sizes="64px"
                           />
                           {activeIndex !== index && (

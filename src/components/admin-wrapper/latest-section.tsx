@@ -11,10 +11,15 @@ import TextareaField from "../ui/forms/TextareaField";
 import CheckboxInput from "../ui/forms/CheckboxInput";
 import { IBlog, ISection } from "@/constants/section.constants";
 import Image from "next/image";
-import { BASE_URL } from "@/lib/axios";
-import { formatDate, generateObjectWithUID, generateUID } from "@/lib/utils";
+import {
+  formatDate,
+  generateObjectWithUID,
+  generateUID,
+  getFullImageUrl,
+} from "@/lib/utils";
 import { useSectionData } from "@/hooks/useSectionData";
 import ImageUploadField from "./_components/ImageUploadField";
+import ImageGuidelines from "../_landing-components/image-guidelines";
 
 interface IProps {
   data: ISection;
@@ -116,14 +121,14 @@ const MenuItems = ({
             >
               {item.image ? (
                 <Image
-                  src={`${BASE_URL}${item.image}`}
+                  src={`${getFullImageUrl(item.image)}`}
                   alt={item.title}
                   width={145}
                   height={155}
-                  className="w-24 h-24 min-w-24 min-h-24 object-cover rounded"
+                  className="w-24 h-24 min-w-24 min-h-24 object-contain rounded"
                 />
               ) : (
-                <div className="w-24 h-24 min-w-24 min-h-24 object-cover rounded bg-gray-400/10" />
+                <div className="w-24 h-24 min-w-24 min-h-24 object-contain rounded bg-gray-400/10" />
               )}
               <div className="overflow-hidden text-ellipsis">
                 <div className="text-sm font-medium mb-1 truncate line-clamp-1 text-ellipsis w-full overflow-hidden">
@@ -202,19 +207,21 @@ export default function LatestNewsSection({ data }: IProps) {
     // @ts-ignore
     const existingPath = formData.content?.data?.[index]?.image;
     return (
-      <ImageUploadField
-        name={fieldName}
-        uploadMedia={uploadMedia}
-        existingImagePath={existingPath}
-        addUploadMedia={addUploadMedia}
-        markDeletedMedia={markDeletedMedia}
-        aspectRatio="w-full sm:min-w-[645px] h-[150] sm:h-[555] lg:h-[555] object-cover rounded"
-        files={{}}
-        onDeleteFile={markDeletedMedia}
-        targetHeight={555}
-        targetWidth={645}
-        skipTool={true}
-      />
+      <>
+        <ImageUploadField
+          name={fieldName}
+          uploadMedia={uploadMedia}
+          existingImagePath={existingPath}
+          addUploadMedia={addUploadMedia}
+          markDeletedMedia={markDeletedMedia}
+          aspectRatio="w-full sm:min-w-[645px] h-[150] sm:h-[555] lg:h-[555] object-contain rounded"
+          files={{}}
+          onDeleteFile={markDeletedMedia}
+          targetHeight={555}
+          targetWidth={645}
+          skipTool={true}
+        />
+      </>
     );
   };
 

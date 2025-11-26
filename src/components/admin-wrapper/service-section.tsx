@@ -11,8 +11,12 @@ import TextareaField from "../ui/forms/TextareaField";
 import CheckboxInput from "../ui/forms/CheckboxInput";
 import { IBlog, ISection } from "@/constants/section.constants";
 import Image from "next/image";
-import { BASE_URL } from "@/lib/axios";
-import { formatDate, generateObjectWithUID, generateUID } from "@/lib/utils";
+import {
+  formatDate,
+  generateObjectWithUID,
+  generateUID,
+  getFullImageUrl,
+} from "@/lib/utils";
 import { useSectionData } from "@/hooks/useSectionData";
 import ImageUploadField from "./_components/ImageUploadField";
 import { FormResetter } from "./_components/FormReseter";
@@ -93,11 +97,11 @@ const MenuItems = ({
               {item.image ? (
                 <ImagePreview
                   // file={file}
-                  url={`${BASE_URL}${item.image}`}
-                  className="!w-[107px] !h-[66px] sm:!h-[66px] lg:!h-[66px] object-contain rounded"
+                  url={`${getFullImageUrl(item.image)}`}
+                  className="!w-[107px] min-w-[107px] !h-[66px] sm:!h-[66px] lg:!h-[66px] object-contain rounded"
                 />
               ) : (
-                <div className="!w-[107px] !h-[66px] sm:!h-[66px] lg:!h-[66px] object-contain rounded bg-gray-400/10" />
+                <div className="!w-[107px] min-w-[107px] !h-[66px] sm:!h-[66px] lg:!h-[66px] object-contain rounded bg-gray-400/10" />
               )}
               <div className="flex flex-col">
                 <div className="text-sm font-medium mb-1">{item.title}</div>
@@ -182,8 +186,9 @@ export default function ServiceSection({ data }: IProps) {
           handleOnChange(fieldName, "");
         }}
         onlyIcon
-        targetHeight={66}
-        targetWidth={107}
+        targetHeight={150}
+        targetWidth={250}
+        skipTool
       />
     );
   };

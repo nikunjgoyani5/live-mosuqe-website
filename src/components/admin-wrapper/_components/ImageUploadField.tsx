@@ -3,11 +3,12 @@
 import Image from "next/image";
 import { Trash2 } from "lucide-react";
 import Dropzone from "@/components/ui/DropZone";
-import { BASE_URL } from "@/lib/axios";
 import Cropper from "react-easy-crop";
 import { useCallback, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import StateButton from "@/components/ui/StateButton";
+import { getFullImageUrl } from "@/lib/utils";
+import ImageGuidelines from "@/components/_landing-components/image-guidelines";
 
 interface IImageUploadFieldProps {
   variant?: "image" | "video" | "both";
@@ -36,7 +37,7 @@ export default function ImageUploadField({
   existingImagePath,
   addUploadMedia,
   markDeletedMedia,
-  className = "w-full h-auto object-cover rounded",
+  className = "w-full h-auto object-contain rounded",
   aspectRatio = "aspect-square",
   existingFiles = [],
   files = {},
@@ -256,6 +257,20 @@ export default function ImageUploadField({
     setRotation(0);
   };
 
+  // Update zoom range and ensure proper dragging behavior
+  const handleZoomChange = (value: number) => {
+    setZoom(value); // Allow zoom to go below 1
+  };
+
+  const handleCropChange = (newCrop: { x: number; y: number }) => {
+    // Ensure crop box stays within image boundaries
+    const constrainedCrop = {
+      x: Math.max(0, Math.min(newCrop.x, 100)), // Adjust boundaries as needed
+      y: Math.max(0, Math.min(newCrop.y, 100)),
+    };
+    setCrop(constrainedCrop);
+  };
+
   // Cropper modal component to avoid duplication
   const CropperModal = (
     <>
@@ -266,10 +281,11 @@ export default function ImageUploadField({
           zoom={zoom}
           rotation={rotation}
           aspect={targetWidth / targetHeight}
-          onCropChange={setCrop}
-          onZoomChange={setZoom}
+          onCropChange={setCrop} // Remove constraints on crop state
+          onZoomChange={handleZoomChange} // Ensure zoom changes are unrestricted
           onRotationChange={setRotation}
           onCropComplete={onCropComplete}
+          restrictPosition={false} // Allow free dragging of the crop box
         />
       </div>
       <div className="flex items-center gap-4 p-4">
@@ -356,7 +372,7 @@ export default function ImageUploadField({
     return (
       <div className={`relative ${aspectRatio}`}>
         <Image
-          src={`${BASE_URL}${existingImagePath}`}
+          src={`${getFullImageUrl(existingImagePath)}`}
           alt="Uploaded"
           className={className}
           fill
@@ -374,24 +390,28 @@ export default function ImageUploadField({
 
   // 3. No image is present, show the dropzone
   return (
-    <div className={aspectRatio}>
-      <Dropzone
-        existingFiles={existingFiles}
-        files={files}
-        name={name}
-        onAddFile={handleAddFile}
-        onDeleteFile={onDeleteFile}
-        className={aspectRatio}
-        {...props}
-      />
-      {/* Cropper Modal */}
-      {showCropper && cropSrc && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="relative w-full max-w-3xl bg-white rounded">
-            {CropperModal}
+    <>
+      <div className={aspectRatio}>
+        <Dropzone
+          existingFiles={existingFiles}
+          files={files}
+          name={name}
+          onAddFile={handleAddFile}
+          onDeleteFile={onDeleteFile}
+          className={aspectRatio}
+          resolution={targetWidth + "X" + targetHeight}
+          {...props}
+        />
+
+        {/* Cropper Modal */}
+        {showCropper && cropSrc && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="relative w-full max-w-3xl bg-white rounded">
+              {CropperModal}
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 }

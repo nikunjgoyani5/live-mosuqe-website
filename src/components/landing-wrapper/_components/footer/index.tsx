@@ -141,8 +141,12 @@ export default function Footer({ data, socialLinks = [] }: IProps) {
             <p className="text-white text-base text-center">{copyrightText}</p>
           </Link>
           <div className="flex gap-4 text-lg">
-            {socialLinksList.map((item) => (
-              <a href={item?.href} className="hover:text-gray-300">
+            {socialLinksList.map((item, i) => (
+              <a
+                key={item?.href + "" + i}
+                href={item?.href}
+                className="hover:text-gray-300"
+              >
                 <item.Icon />
               </a>
             ))}

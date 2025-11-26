@@ -129,7 +129,7 @@ const ProductImageWithOverlayComponent: React.FC<Props> = ({
           <Image
             src={imageSrc}
             alt="Product"
-            className="w-full h-60 sm:h-80 md:h-96 lg:h-full object-cover"
+            className="w-full h-60 sm:h-80 md:h-96 lg:h-full object-contain"
             width={384}
             height={384}
           />
@@ -144,7 +144,7 @@ const ProductImageWithOverlayComponent: React.FC<Props> = ({
         <Image
           src={imageSrc}
           alt="Product"
-          className="w-full h-60 sm:h-80 md:h-96 lg:h-full lg:max-h-[650px] object-cover"
+          className="w-full h-60 sm:h-80 md:h-96 lg:h-full lg:max-h-[650px] object-contain"
           width={384}
           height={384}
         />
@@ -179,7 +179,7 @@ const ProductImageWithOverlayComponent: React.FC<Props> = ({
                                 carouselIndex + 1
                               }`}
                               fill
-                              className="object-cover"
+                              className="object-contain"
                               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                             />
                           </div>

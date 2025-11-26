@@ -155,7 +155,7 @@ function FeaturedCard({ className = "", item, index = 0 }: FeaturedCardProps) {
         image
           ? {
               backgroundImage: `url(${image})`,
-              backgroundSize: "cover",
+              backgroundSize: "contain",
               backgroundPosition: "center",
             }
           : {}
@@ -231,7 +231,7 @@ function SideCard({ item, index = 1 }: { item: any; index?: number }) {
             src={image}
             alt={title}
             fill
-            className="object-cover transition-transform duration-300 hover:scale-105"
+            className="object-cover object-center transition-transform duration-300 hover:scale-105"
           />
         ) : (
           <ImageOff className="w-8 h-8 text-gray-400" />

@@ -4,10 +4,12 @@ import Image from "next/image";
 import React, { useRef } from "react";
 import { GoPlus } from "react-icons/go";
 import { MdDelete } from "react-icons/md";
+import ImageGuidelines from "../_landing-components/image-guidelines";
 
 interface DropzoneProps {
   name: string;
   className?: string;
+  resolution?: string;
   onlyIcon?: boolean;
   files: { [key: string]: File };
   onAddFile: (key: string, file: File) => void;
@@ -34,6 +36,7 @@ export default function Dropzone({
   className = "",
   variant = "both",
   onlyIcon = false,
+  resolution = "",
 }: DropzoneProps) {
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -55,26 +58,35 @@ export default function Dropzone({
 
   return (
     <div className="flex items-center gap-4 w-full">
-      <div
-        className={`flex text-center flex-col items-center justify-center border-2 border-dashed rounded-md p-4 cursor-pointer w-full min-h-52 ${className}`}
-        onClick={() => fileInput.current?.click()}
-      >
-        <GoPlus size={32} />
-        {!onlyIcon && (
-          <p className="text-sm">Drop your image here, or browse</p>
+      <div className="flex flex-col w-full">
+        <div
+          className={`flex text-center flex-col items-center justify-center border-2 border-dashed rounded-md p-4 cursor-pointer w-full min-h-52 ${className}`}
+          onClick={() => fileInput.current?.click()}
+        >
+          <GoPlus size={32} />
+          {!onlyIcon && (
+            <p className="text-sm">Drop your image here, or browse</p>
+          )}
+          {!onlyIcon && (
+            <p className="text-xs text-gray-400">
+              Supports {variant === "both" ? "images & videos" : variant}
+            </p>
+          )}
+          {!onlyIcon && resolution && (
+            <p className="text-xs text-gray-400">({resolution} px)</p>
+          )}
+          <input
+            type="file"
+            ref={fileInput}
+            className="hidden"
+            accept={acceptTypes}
+            onChange={handleFileChange}
+          />
+        </div>
+
+        {onlyIcon && resolution && (
+          <p className="text-xs text-gray-400 pt-1">({resolution} px)</p>
         )}
-        {!onlyIcon && (
-          <p className="text-xs text-gray-400">
-            Supports {variant === "both" ? "images & videos" : variant}
-          </p>
-        )}
-        <input
-          type="file"
-          ref={fileInput}
-          className="hidden"
-          accept={acceptTypes}
-          onChange={handleFileChange}
-        />
       </div>
 
       {/* Previews of existing files */}
@@ -93,7 +105,6 @@ export default function Dropzone({
           />
         </div>
       ))}
-
       {/* Previews of new uploads */}
       {Object.entries(files).map(([key, file]) => (
         <div key={key} className="relative">

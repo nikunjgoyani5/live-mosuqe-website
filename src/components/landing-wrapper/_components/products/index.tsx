@@ -107,7 +107,7 @@ const ProductComponent = ({ data }: IProps) => {
         <Image
           src="/productRightTop.png"
           alt="Top Right Decoration"
-          className="w-full h-auto object-cover object-right-top"
+          className="w-full h-auto object-contain object-right-top"
           width={256}
           height={256}
         />
@@ -118,7 +118,7 @@ const ProductComponent = ({ data }: IProps) => {
         <Image
           src="/productLeftBottom.png"
           alt="Bottom Left Decoration"
-          className="w-full h-auto object-cover object-left-bottom"
+          className="w-full h-auto object-contain object-left-bottom"
           width={100}
           height={100}
         />
@@ -134,7 +134,7 @@ const ProductComponent = ({ data }: IProps) => {
             <Image
               src="/Searviceheader.png"
               alt="Product"
-              className="w-8 h-10 sm:w-10 sm:h-12 object-cover"
+              className="w-8 h-10 sm:w-10 sm:h-12 object-contain"
               width={40}
               height={40}
             />

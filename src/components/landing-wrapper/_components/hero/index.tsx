@@ -62,7 +62,7 @@ export default function Hero({ data }: IProps) {
                   <Image
                     src={item.url}
                     alt={`Hero banner ${index + 1}`}
-                    className="absolute inset-0 h-full w-full object-cover"
+                    className="absolute inset-0 h-full w-full lg:object-cover object-cover object-top bg-[#F4F4F4]"
                     width={1920}
                     height={1080}
                   />

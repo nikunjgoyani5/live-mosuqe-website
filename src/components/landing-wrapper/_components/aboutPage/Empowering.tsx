@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { ISection } from "@/constants/section.constants";
-import { BASE_URL } from "@/lib/axios";
+import { getFullImageUrl } from "@/lib/utils";
 
 interface IProps {
   data?: ISection;
@@ -11,7 +11,7 @@ interface IProps {
 const toUrl = (url?: string) => {
   if (!url) return undefined;
   if (url.startsWith("http")) return url;
-  return `${BASE_URL}${url}`;
+  return getFullImageUrl(`${url}`);
 };
 
 export default function Empowering({ data }: IProps) {
@@ -32,7 +32,7 @@ export default function Empowering({ data }: IProps) {
               alt={title}
               width={900}
               height={650}
-              className="w-full h-auto object-cover"
+              className="w-full h-auto object-contain"
             />
           </div>
         </div>

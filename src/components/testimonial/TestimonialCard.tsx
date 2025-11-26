@@ -30,7 +30,7 @@ export default function TestimonialCard({ quote, name, location, rating, avatar,
                     <div className="flex items-center gap-4 flex-shrink-0">
                         <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-200 flex items-center justify-center flex-shrink-0">
                             {avatar ? (
-                                <img src={avatar} alt={name} className="w-full h-full object-cover" />
+                                <img src={avatar} alt={name} className="w-full h-full object-contain" />
                             ) : (
                                 <ImageOff className="w-6 h-6 text-gray-400" />
                             )}

@@ -5,12 +5,11 @@ import StateButton from "@/components/ui/StateButton";
 import FormProvider from "@/context/FormProvider";
 import TextInput from "@/components/ui/forms/TextInput";
 import { Trash2 } from "lucide-react";
-import SelectInput from "../ui/forms/SelectInput";
-import { BASE_URL } from "@/lib/axios";
 import Image from "next/image";
 import { ISection } from "@/constants/section.constants";
 import SectionWrapper from "./_components/sectionWrapper";
 import ImageUploadField from "./_components/ImageUploadField";
+import { getFullImageUrl } from "@/lib/utils";
 
 interface IProps {
   data: ISection;
@@ -93,7 +92,7 @@ export default function AboutSection({ data }: IProps) {
                       muted
                       loop
                       controls={false}
-                      className="w-full h-auto max-h-[240px] sm:max-h-[360px] lg:max-h-[537px] object-cover rounded"
+                      className="w-full h-auto max-h-[240px] sm:max-h-[360px] lg:max-h-[537px] object-contain rounded"
                       style={{
                         borderRadius: "45px 0px 0px 45px",
                       }}
@@ -117,9 +116,9 @@ export default function AboutSection({ data }: IProps) {
                   (formData.content as Record<string, string>).media_url
                 ) ? (
                   <Image
-                    src={`${BASE_URL}${
+                    src={`${getFullImageUrl(
                       (formData.content as Record<string, string>).media_url
-                    }`}
+                    )}`}
                     alt="Uploaded"
                     className="w-full h-auto max-h-[240px] sm:max-h-[360px] lg:max-h-[537px] object-contain rounded"
                     unoptimized
@@ -132,14 +131,14 @@ export default function AboutSection({ data }: IProps) {
                   />
                 ) : (
                   <video
-                    src={`${BASE_URL}${
+                    src={`${getFullImageUrl(
                       (formData.content as Record<string, string>).media_url
-                    }`}
+                    )}`}
                     autoPlay
                     muted
                     loop
                     controls={false}
-                    className="w-full h-auto max-h-[240px] sm:max-h-[360px] lg:max-h-[537px] object-cover rounded"
+                    className="w-full h-auto max-h-[240px] sm:max-h-[360px] lg:max-h-[537px] object-contain rounded"
                     style={{
                       borderRadius: "45px 0px 0px 45px",
                     }}
@@ -182,7 +181,7 @@ export default function AboutSection({ data }: IProps) {
                   markDeletedMedia(key, path);
                   handleOnChange(key, "");
                 }}
-                aspectRatio="w-full h-[240px] sm:h-[360px] lg:h-[537px] object-cover rounded"
+                aspectRatio="w-full h-[240px] sm:h-[360px] lg:h-[537px] object-contain rounded"
                 existingFiles={[]}
                 markDeletedMedia={function (
                   name: string,

@@ -5,7 +5,6 @@ import StateButton from "@/components/ui/StateButton";
 import FormProvider from "@/context/FormProvider";
 import TextInput from "@/components/ui/forms/TextInput";
 import { Trash2 } from "lucide-react";
-import { BASE_URL } from "@/lib/axios";
 import Image from "next/image";
 import { ISection } from "@/constants/section.constants";
 import SectionWrapper from "../_components/sectionWrapper";
@@ -13,12 +12,21 @@ import TextareaField from "@/components/ui/forms/TextareaField";
 import DownloadVariantsForm from "./download-variants-form";
 import ProductVariantsForm from "./product-variants-form";
 import ImageUploadField from "../_components/ImageUploadField";
+import { getFullImageUrl } from "@/lib/utils";
 
 interface IProps {
   data: ISection;
+  productIndex: number;
 }
 
-export default function ProductsSection({ data }: IProps) {
+const WIDTHHEIGHTMAPING: any = {
+  0: { width: 410, height: 260 },
+  1: { width: 206, height: 510 },
+  2: { width: 215, height: 470 },
+  3: { width: 215, height: 290 },
+};
+
+export default function ProductsSection({ data, productIndex }: IProps) {
   const { content, _id: sectionId, name, visible } = data;
   const {
     handleSubmit,
@@ -43,6 +51,40 @@ export default function ProductsSection({ data }: IProps) {
   // @ts-ignore
 
   const addCount = uploadedCount + uploadMediaCount - markDeletedMediaCount;
+
+  // Update logic to generate unique keys for new uploads
+  const generateUniqueKey = (existingKeys: string[], baseKey: string) => {
+    let index = 0;
+    while (
+      existingKeys.includes(`${baseKey}.Image${index}`) ||
+      existingKeys.includes(`Image${index}`)
+    ) {
+      index++;
+    }
+
+    return `${baseKey}.Image${index}`;
+  };
+
+  //slider images
+  const uniqueKey = generateUniqueKey(
+    [
+      //@ts-ignore
+      ...Object.keys(formData.content?.imagesData || {}),
+      ...Object.keys(uploadMedia),
+    ],
+    "content.imagesData"
+  );
+
+  // modal images
+  const uniquemodalImageKey = generateUniqueKey(
+    [
+      //@ts-ignore
+      ...Object.keys(formData.content?.modalImages || {}),
+      ...Object.keys(uploadMedia),
+    ],
+    "content.modalImages"
+  );
+
   return (
     <SectionWrapper sectionId={sectionId} title={name} visible={visible}>
       <FormProvider
@@ -72,12 +114,12 @@ export default function ProductsSection({ data }: IProps) {
               Object.entries(uploadMedia).map(
                 ([key, file]: [string, File]) =>
                   key === "content.media_url" && (
-                    <div key={key} className="relative">
+                    <div key={key} className="relative bg-gray-100 rounded">
                       {!isVideo(file) ? (
                         <Image
                           src={URL.createObjectURL(file)}
                           alt="Preview"
-                          className="w-full h-[300] sm:h-[400] lg:h-[400] object-cover rounded"
+                          className="w-full h-[300] sm:h-[400] lg:h-[400] object-contain rounded"
                           unoptimized
                           width={500}
                           height={500}
@@ -89,7 +131,7 @@ export default function ProductsSection({ data }: IProps) {
                           muted
                           loop
                           controls={false}
-                          className="w-full h-[300] sm:h-[400] lg:h-[400] object-cover rounded"
+                          className="w-full h-[300] sm:h-[400] lg:h-[400] object-contain rounded"
                         />
                       )}
                       <button
@@ -106,30 +148,30 @@ export default function ProductsSection({ data }: IProps) {
                   )
               )
             ) : (formData.content as Record<string, string>)?.media_url ? (
-              <div className="relative">
+              <div className="relative bg-gray-100 rounded">
                 {!isVideo(
                   (formData.content as Record<string, string>).media_url
                 ) ? (
                   <Image
-                    src={`${BASE_URL}${
+                    src={`${getFullImageUrl(
                       (formData.content as Record<string, string>).media_url
-                    }`}
+                    )}`}
                     alt="Uploaded"
-                    className="w-full h-[300] sm:h-[400] lg:h-[400] object-cover rounded"
+                    className="w-full h-[300] sm:h-[400] lg:h-[400] object-contain rounded"
                     unoptimized
                     width={500}
                     height={500}
                   />
                 ) : (
                   <video
-                    src={`${BASE_URL}${
+                    src={`${getFullImageUrl(
                       (formData.content as Record<string, string>).media_url
-                    }`}
+                    )}`}
                     autoPlay
                     muted
                     loop
                     controls={false}
-                    className="w-full h-[300] sm:h-[400] lg:h-[400] object-cover rounded"
+                    className="w-full h-[300] sm:h-[400] lg:h-[400] object-contain rounded"
                   />
                 )}
                 <button
@@ -167,7 +209,7 @@ export default function ProductsSection({ data }: IProps) {
                   markDeletedMedia(key, path);
                   handleOnChange(key, "");
                 }}
-                aspectRatio="w-full h-[300] sm:h-[400] lg:h-[537px] min-w-[800px] object-cover rounded"
+                aspectRatio="w-full h-[300] sm:h-[400] lg:h-[537px] w-full object-contain rounded"
                 existingFiles={[]}
                 markDeletedMedia={function (
                   name: string,
@@ -176,8 +218,8 @@ export default function ProductsSection({ data }: IProps) {
                   markDeletedMedia(name, pathToDelete);
                 }}
                 variant="image"
-                targetHeight={944}
-                targetWidth={823}
+                targetHeight={500}
+                targetWidth={500}
               />
             )}
 
@@ -191,21 +233,21 @@ export default function ProductsSection({ data }: IProps) {
                         <div key={val + i} className="relative">
                           {!isVideo(val) ? (
                             <Image
-                              src={`${BASE_URL}${val}`}
+                              src={`${getFullImageUrl(val)}`}
                               alt="Uploaded"
-                              className="w-[100] h-[100] sm:h-[100] lg:h-[100] object-cover rounded"
+                              className="w-[100] h-[100] sm:h-[100] lg:h-[100] object-contain rounded"
                               unoptimized
                               width={500}
                               height={500}
                             />
                           ) : (
                             <video
-                              src={`${BASE_URL}${val}`}
+                              src={`${getFullImageUrl(val)}`}
                               autoPlay
                               muted
                               loop
                               controls={false}
-                              className="w-[100] h-[100] sm:h-[100] lg:h-[100] object-cover rounded"
+                              className="w-[100] h-[100] sm:h-[100] lg:h-[100] object-contain rounded"
                             />
                           )}
                           <button
@@ -230,6 +272,7 @@ export default function ProductsSection({ data }: IProps) {
                       )
                   )
                 : null}
+              {/* mobile , laptop */}
               {Object.keys(uploadMedia).length > 0
                 ? // 1️⃣ Show previews for newly selected files
                   Object.entries(uploadMedia).map(
@@ -242,7 +285,7 @@ export default function ProductsSection({ data }: IProps) {
                             <Image
                               src={URL.createObjectURL(file)}
                               alt="Preview"
-                              className="w-[100] h-[100] sm:h-[100] lg:h-[100] object-cover rounded"
+                              className="w-[100] h-[100] sm:h-[100] lg:h-[100] object-contain rounded"
                               unoptimized
                               width={500}
                               height={500}
@@ -254,7 +297,7 @@ export default function ProductsSection({ data }: IProps) {
                               muted
                               loop
                               controls={false}
-                              className="w-[100] h-[100] sm:h-[100] lg:h-[100] object-cover rounded"
+                              className="w-[100] h-[100] sm:h-[100] lg:h-[100] object-contain rounded"
                             />
                           )}
                           <button
@@ -272,11 +315,9 @@ export default function ProductsSection({ data }: IProps) {
                   )
                 : null}
               {/* // 3️⃣ Nothing there yet → show Dropzone */}
-              <div className="h-[100] sm:h-[100] lg:h-[100] object-cover rounded">
+              <div className="h-[100] sm:h-[100] lg:h-[100] object-contain rounded">
                 <ImageUploadField
-                  name={`content.imagesData.Image${
-                    addCount < 0 ? 0 : addCount
-                  }`}
+                  name={`${uniqueKey}`}
                   files={{}}
                   uploadMedia={uploadMedia}
                   existingImagePath={null}
@@ -295,8 +336,9 @@ export default function ProductsSection({ data }: IProps) {
                   }}
                   onlyIcon
                   variant="image"
-                  targetHeight={700}
-                  targetWidth={700}
+                  targetHeight={WIDTHHEIGHTMAPING[productIndex]?.height}
+                  targetWidth={WIDTHHEIGHTMAPING[productIndex]?.width}
+                  skipTool
                 />
               </div>
             </div>
@@ -311,21 +353,21 @@ export default function ProductsSection({ data }: IProps) {
                         <div key={val + i} className="relative">
                           {!isVideo(val) ? (
                             <Image
-                              src={`${BASE_URL}${val}`}
+                              src={`${getFullImageUrl(val)}`}
                               alt="Uploaded"
-                              className="w-[100] h-[100] sm:h-[100] lg:h-[100] object-cover rounded"
+                              className="w-[100] h-[100] sm:h-[100] lg:h-[100] object-contain rounded"
                               unoptimized
                               width={500}
                               height={500}
                             />
                           ) : (
                             <video
-                              src={`${BASE_URL}${val}`}
+                              src={`${getFullImageUrl(val)}`}
                               autoPlay
                               muted
                               loop
                               controls={false}
-                              className="w-[100] h-[100] sm:h-[100] lg:h-[100] object-cover rounded"
+                              className="w-[100] h-[100] sm:h-[100] lg:h-[100] object-contain rounded"
                             />
                           )}
                           <button
@@ -362,7 +404,7 @@ export default function ProductsSection({ data }: IProps) {
                             <Image
                               src={URL.createObjectURL(file)}
                               alt="Preview"
-                              className="w-[100] h-[100] sm:h-[100] lg:h-[100] object-cover rounded"
+                              className="w-[100] h-[100] sm:h-[100] lg:h-[100] object-contain rounded"
                               unoptimized
                               width={500}
                               height={500}
@@ -374,7 +416,7 @@ export default function ProductsSection({ data }: IProps) {
                               muted
                               loop
                               controls={false}
-                              className="w-[100] h-[100] sm:h-[100] lg:h-[100] object-cover rounded"
+                              className="w-[100] h-[100] sm:h-[100] lg:h-[100] object-contain rounded"
                             />
                           )}
                           <button
@@ -392,7 +434,7 @@ export default function ProductsSection({ data }: IProps) {
                   )
                 : null}
               {/* // 3️⃣ Nothing there yet → show Dropzone */}
-              <div className=" h-[100] sm:h-[100] lg:h-[100] object-cover rounded">
+              <div className=" h-[100] sm:h-[100] lg:h-[100] object-contain rounded">
                 {/* <Dropzone
                   name={`content.modalImages.Image${
                     addCount < 0 ? 0 : addCount
@@ -408,9 +450,7 @@ export default function ProductsSection({ data }: IProps) {
                   className="!w-[100] !h-[100] min-h-[100] max-h-[100] min-w-[100] max-w-[100] bg-[#EDF0F2] border-solid"
                 /> */}
                 <ImageUploadField
-                  name={`content.modalImages.Image${
-                    addCount < 0 ? 0 : addCount
-                  }`}
+                  name={`${uniquemodalImageKey}`}
                   files={{}}
                   uploadMedia={uploadMedia}
                   existingImagePath={null}
@@ -431,6 +471,7 @@ export default function ProductsSection({ data }: IProps) {
                   variant="image"
                   targetHeight={700}
                   targetWidth={700}
+                  skipTool
                 />
               </div>
             </div>

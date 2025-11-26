@@ -11,8 +11,12 @@ import TextareaField from "../ui/forms/TextareaField";
 import CheckboxInput from "../ui/forms/CheckboxInput";
 import { IBlog, ISection, ITestimonial } from "@/constants/section.constants";
 import Image from "next/image";
-import { BASE_URL } from "@/lib/axios";
-import { formatDate, generateObjectWithUID, generateUID } from "@/lib/utils";
+import {
+  formatDate,
+  generateObjectWithUID,
+  generateUID,
+  getFullImageUrl,
+} from "@/lib/utils";
 import { useSectionData } from "@/hooks/useSectionData";
 import ImageUploadField from "./_components/ImageUploadField";
 import { FormResetter } from "./_components/FormReseter";
@@ -66,7 +70,7 @@ const MenuItems = ({
       <label className="text-lg font-medium mb-2 block">
         Edit Testimonials
       </label>
-      <div>{imageUpload(index, uploadMedia)}</div>
+      <div className="mb-5">{imageUpload(index, uploadMedia)}</div>
       <TextInput name={`content.data.${index}.name`} label="Name" />
       <TextInput name={`content.data.${index}.text`} label="Text" />
       <TextInput name={`content.data.${index}.rating`} label="Rating" />
@@ -93,7 +97,7 @@ const MenuItems = ({
             >
               {item.image ? (
                 <ImagePreview
-                  url={`${BASE_URL}${item.image}`}
+                  url={`${getFullImageUrl(item.image)}`}
                   className="w-12 h-12 min-w-12 min-h-12 object-contain rounded"
                 />
               ) : (
@@ -184,6 +188,8 @@ export default function ServiceSection({ data }: IProps) {
         files={{}}
         onDeleteFile={markDeletedMedia}
         onlyIcon
+        targetHeight={200}
+        targetWidth={200}
       />
     );
   };

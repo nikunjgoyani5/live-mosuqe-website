@@ -142,11 +142,14 @@ export function useSection(
         formDataToSend.append("files", file);
       });
 
-      const { uploaded } = await manageMedia(sectionId, formDataToSend);
+      const { uploaded, deleted } = await manageMedia(
+        sectionId,
+        formDataToSend
+      );
 
-      return { uploaded };
+      return { uploaded, deleted };
     }
-    return { uploaded: [] };
+    return { uploaded: [], deleted: [] };
   };
 
   const handleSubmitMedias = async () => {

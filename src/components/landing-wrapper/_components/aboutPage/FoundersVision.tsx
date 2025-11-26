@@ -1,7 +1,7 @@
 "use client";
 
 import { ISection } from "@/constants/section.constants";
-import { BASE_URL } from "@/lib/axios";
+import { getFullImageUrl } from "@/lib/utils";
 
 interface IProps {
   data?: ISection;
@@ -12,7 +12,7 @@ const isVideo = (url?: string) =>
 const toUrl = (url?: string) => {
   if (!url) return undefined;
   if (url.startsWith("http")) return url;
-  return `${BASE_URL}${url}`;
+  return getFullImageUrl(`${url}`);
 };
 
 export default function FoundersVision({ data }: IProps) {
@@ -29,7 +29,7 @@ export default function FoundersVision({ data }: IProps) {
                 isVideo(mediaUrl) ? (
                     <video
                         src={mediaUrl}
-                        className="absolute inset-0 w-full h-full object-cover opacity-70"
+                        className="absolute inset-0 w-full h-full object-contain opacity-70"
                         autoPlay
                         muted
                         loop
@@ -37,7 +37,7 @@ export default function FoundersVision({ data }: IProps) {
                     />
                 ) : ( */}
       <div
-        className="absolute inset-0 bg-center bg-cover"
+        className="absolute inset-0 bg-center bg-contain bg-no-repeat"
         style={{ backgroundImage: `url(${mediaUrl})` }}
       />
       {/* )

@@ -7,7 +7,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { BASE_URL } from "@/lib/axios";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { DotButton, useDotButton } from "./useDotButton";
@@ -18,6 +17,8 @@ import {
   usePrevNextButtons,
 } from "./usePrevNextButtons";
 import { Trash2 } from "lucide-react";
+import { getFullImageUrl } from "@/lib/utils";
+import ImageGuidelines from "@/components/_landing-components/image-guidelines";
 
 function SliderHeroForm({
   data,
@@ -35,6 +36,9 @@ function SliderHeroForm({
   }, []);
   return (
     <div>
+      <div className="flex justify-end pb-1">
+        <ImageGuidelines resolution="1920X920" />
+      </div>
       <div className="relative w-full overflow-hidden">
         {mounted && (
           <Carousel
@@ -51,10 +55,10 @@ function SliderHeroForm({
                 (item: any, i: number) =>
                   item.url && (
                     <CarouselItem key={i} className="basis-full">
-                      <div className="relative h-screen w-full">
+                      <div className="relative xl:h-[900px] h-screen w-full">
                         {item.type === "video" ? (
                           <video
-                            src={`${BASE_URL}${item.url}`}
+                            src={`${getFullImageUrl(item.url)}`}
                             autoPlay
                             muted
                             loop
@@ -63,7 +67,7 @@ function SliderHeroForm({
                           />
                         ) : (
                           <Image
-                            src={`${BASE_URL}${item.url}`}
+                            src={`${getFullImageUrl(item.url)}`}
                             alt={item.url}
                             className="absolute inset-0 h-full w-full object-cover"
                             width={1920}

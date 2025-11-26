@@ -68,6 +68,7 @@ export function generateObjectWithUID<T extends object>(prefix = "id") {
 export function getFullImageUrl(url: any): string {
   if (!url) return url;
 
+  if (typeof url !== "string") return "";
   // If it's already a full URL (starts with http/https), return as is
   if (url.startsWith("http://") || url.startsWith("https://")) {
     return url;

@@ -39,12 +39,16 @@ export default function LiveMosqueCard({
         {/* Card body with shadow (excluding taj) */}
         <div className="rounded-2xl shadow-[0_1px_20px_1px_rgba(0,0,0,0.25),0_25px_30px_-15px_rgba(0,0,0,0.15),0_10px_10px_-5px_rgba(0,0,0,0.1)] bg-secondary-color pb-1.5 mt-0">
           <div className="bg-white rounded-2xl px-3 py-4 flex gap-5 items-start min-h-[80px]">
-            <div className="flex-shrink-0 w-24 h-18 rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center">
+            <div
+              className={`flex-shrink-0 w-24 h-18 rounded-xl overflow-hidden flex items-center justify-center ${
+                image ? "" : "bg-gray-100"
+              }`}
+            >
               {image ? (
                 <Image
                   src={image}
                   alt={title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                   width={96}
                   height={72}
                 />

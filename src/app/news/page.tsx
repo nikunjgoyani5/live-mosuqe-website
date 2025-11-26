@@ -85,7 +85,8 @@ export default function NewsPage() {
 
   if (isLoading) {
     return <Loader />;
-  } NewsPage
+  }
+  NewsPage;
 
   return (
     <div className="min-h-screen bg-[#F4F4F4]">
@@ -97,7 +98,7 @@ export default function NewsPage() {
           src="/newsPage.png"
           alt="News hero"
           fill
-          className="object-cover"
+          className="object-contain"
           priority
         />
         <div className="absolute  inset-0 bg-black/40" />
@@ -244,7 +245,7 @@ export default function NewsPage() {
                           src={item.image}
                           alt={item.title}
                           fill
-                          className="object-cover"
+                          className="object-contain"
                         />
                       ) : (
                         <div className="absolute inset-0 flex items-center justify-center bg-gray-200">

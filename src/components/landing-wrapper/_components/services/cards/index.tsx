@@ -62,7 +62,7 @@ export default function Card({
                     <Image
                       src={String(finalCardData.mainImage?.src)}
                       alt={String(finalCardData.mainImage?.alt)}
-                      className="w-full h-40 md:max-h-20 object-cover rounded-xl"
+                      className="w-full h-40 md:max-h-20 object-contain rounded-xl"
                       width={200}
                       height={200}
                     />

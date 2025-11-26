@@ -8,6 +8,7 @@ import Footer from "./_components/footer";
 import Header from "./_components/header";
 import LiveMosqueSection from "./_components/livemosque";
 import { ISections } from "@/constants/section.constants";
+import Donation from "./_components/donationPage/Donation";
 
 interface IProps {
   data?: ISections;
@@ -33,6 +34,7 @@ export default function LandinnWrapper({ data }: IProps) {
       <LiveMosqueSection data={data?.SERVICES} />
       <AboutSection data={data?.ABOUTUS} />
       <ProductComponent data={data?.PRODUCTS} />
+      <Donation data={data?.DONATION} />
       <TestimonialsLanding data={data?.TESTIMONIALS} />
       <ContactSection data={data?.CONTACTUS} />
       <Footer

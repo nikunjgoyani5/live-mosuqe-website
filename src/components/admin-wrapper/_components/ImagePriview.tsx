@@ -7,7 +7,7 @@ export default function ImagePreview({
   url,
   file,
   onDelete,
-  className = "w-full h-[300] sm:h-[400] lg:h-[500] object-cover rounded",
+  className = "w-full h-[300] sm:h-[400] lg:h-[500] object-contain rounded",
 }: {
   url?: string;
   file?: File;
