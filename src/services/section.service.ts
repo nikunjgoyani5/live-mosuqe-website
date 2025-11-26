@@ -50,6 +50,6 @@ export const manageMedia = async (
     return data;
   } catch (e) {
     console.log("while getting sections", e);
-    return { uploaded: [], deleted: [] };
+    throw e;
   }
 };

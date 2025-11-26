@@ -168,8 +168,8 @@ export default function DonationPageSection({ data }: IProps) {
             <TextInput name="content.label" label="Page Label" />
             <TextInput name="content.title" label="Heading" />
             <TextareaField name={`content.description`} label="Description" />
-            <TextInput name="content.btnText" label="Button Text" />
-            <TextInput name="content.path" label="Path" />
+            {/* <TextInput name="content.btnText" label="Button Text" />
+            <TextInput name="content.path" label="Path" /> */}
           </div>
         </div>
 

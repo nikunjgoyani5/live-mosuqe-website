@@ -13,6 +13,7 @@ import DownloadVariantsForm from "./download-variants-form";
 import ProductVariantsForm from "./product-variants-form";
 import ImageUploadField from "../_components/ImageUploadField";
 import { getFullImageUrl } from "@/lib/utils";
+import VideoFeatureProduct from "./videoFeature";
 
 interface IProps {
   data: ISection;
@@ -482,6 +483,8 @@ export default function ProductsSection({ data, productIndex }: IProps) {
             <TextareaField name={`content.description`} label="Description" />
             <ProductVariantsForm />
             <DownloadVariantsForm />
+            <TextInput name="content.downloadText" label="Download It Free" />
+            <VideoFeatureProduct />
           </div>
         </div>
 

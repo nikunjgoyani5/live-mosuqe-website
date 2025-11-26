@@ -20,6 +20,10 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
   reverseLayout = false,
   modelImage,
   slug,
+  videoBtnText,
+  videoPath,
+  downloadText,
+  isVideoEnabled = false,
 }) => {
   const sectionId = React.useMemo(() => {
     if (!slug) return undefined;
@@ -48,6 +52,10 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
         readMoreLabel={readMoreLabel}
         slug={slug}
         modelImage={modelImage}
+        videoBtnText={videoBtnText}
+        videoPath={videoPath}
+        downloadText={downloadText}
+        isVideoEnabled={isVideoEnabled}
       />
     </div>
   );

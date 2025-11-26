@@ -27,6 +27,10 @@ const ProductComponent = ({ data }: IProps) => {
                 image: string;
                 link?: string;
               }[];
+              isVideoEnabled?: boolean;
+              btnText?: string;
+              path?: string;
+              downloadText?: string;
             };
 
           const imageSrc = getFullImageUrl(
@@ -94,6 +98,10 @@ const ProductComponent = ({ data }: IProps) => {
               platforms.length > 0
                 ? "Order pre-installed Masjid Clock box"
                 : undefined,
+            videoBtnText: productContent?.btnText || "",
+            videoPath: productContent?.path || "",
+            downloadText: productContent?.downloadText || "Download It Free",
+            isVideoEnabled: productContent?.isVideoEnabled || false,
           } as ProductSectionProps;
         })
     : productData;

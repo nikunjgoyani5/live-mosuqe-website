@@ -214,7 +214,8 @@ export default function ServiceSection({ data }: IProps) {
             if (dataIndex !== -1) newData[dataIndex].image = value.image;
           });
 
-          handleSubmit({ content: { ...content, data: newData } });
+          // @ts-ignore
+          handleSubmit({ content: { ...values?.content, data: newData } });
         }}
         options={{
           defaultValues: formData,

@@ -73,7 +73,7 @@ export default function Donation({ data }: IProps) {
                 <p key={idx}>{line}</p>
               ))}
           </div>
-          <Button
+          {/* <Button
             asChild
             className="bg-secondary-color border-0 shadow-none
                                             rounded-lg sm:rounded-lg
@@ -87,7 +87,7 @@ export default function Donation({ data }: IProps) {
             <a href={content?.path || "#"} target="_blank">
               {content?.btnText || "Donate now"}
             </a>
-          </Button>
+          </Button> */}
         </div>
       </div>
     </section>
