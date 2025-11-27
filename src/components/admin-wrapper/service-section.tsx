@@ -11,8 +11,12 @@ import TextareaField from "../ui/forms/TextareaField";
 import CheckboxInput from "../ui/forms/CheckboxInput";
 import { IBlog, ISection } from "@/constants/section.constants";
 import Image from "next/image";
-import { BASE_URL } from "@/lib/axios";
-import { formatDate, generateObjectWithUID, generateUID } from "@/lib/utils";
+import {
+  formatDate,
+  generateObjectWithUID,
+  generateUID,
+  getFullImageUrl,
+} from "@/lib/utils";
 import { useSectionData } from "@/hooks/useSectionData";
 import ImageUploadField from "./_components/ImageUploadField";
 import { FormResetter } from "./_components/FormReseter";
@@ -58,7 +62,7 @@ const MenuItems = ({
   };
 
   const showNewEdit = (index: number) => (
-    <>
+    <div key={index}>
       <label className="text-lg font-medium mb-2 block">Edit Service</label>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-5">
         <div className="flex gap-5 w-full col-span-2">
@@ -72,7 +76,7 @@ const MenuItems = ({
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 
   return (
@@ -93,13 +97,13 @@ const MenuItems = ({
               {item.image ? (
                 <ImagePreview
                   // file={file}
-                  url={`${BASE_URL}${item.image}`}
-                  className="w-24 h-24 min-w-24 min-h-24 object-contain rounded"
+                  url={`${getFullImageUrl(item.image)}`}
+                  className="!w-[107px] min-w-[107px] !h-[66px] sm:!h-[66px] lg:!h-[66px] object-contain rounded"
                 />
               ) : (
-                <div className="w-24 h-24 min-w-24 min-h-24 object-contain rounded bg-gray-400/10" />
+                <div className="!w-[107px] min-w-[107px] !h-[66px] sm:!h-[66px] lg:!h-[66px] object-contain rounded bg-gray-400/10" />
               )}
-              <div className="flex flex-col gap-5">
+              <div className="flex flex-col">
                 <div className="text-sm font-medium mb-1">{item.title}</div>
                 <div className="text-xs text-gray-600 line-clamp-2">
                   {item.subtitle}
@@ -126,7 +130,13 @@ const MenuItems = ({
 };
 
 export default function ServiceSection({ data }: IProps) {
-  const { content, _id: sectionId, name, refetch } = useSectionData(data);
+  const {
+    content,
+    _id: sectionId,
+    name,
+    refetch,
+    visible,
+  } = useSectionData(data);
   const [deletedCards, setDeletedCards] = useState<string[]>([]);
   const {
     handleSubmit,
@@ -134,6 +144,7 @@ export default function ServiceSection({ data }: IProps) {
     loading,
     uploadMedia,
     markDeletedMedia,
+    handleOnChange,
     addUploadMedia,
   } = useSection(
     {
@@ -168,10 +179,16 @@ export default function ServiceSection({ data }: IProps) {
         existingImagePath={existingPath}
         addUploadMedia={addUploadMedia}
         markDeletedMedia={markDeletedMedia}
-        aspectRatio="!w-[200px] !h-[100px] sm:!h-[100px] lg:!h-[100px] object-contain rounded min-h-auto"
+        aspectRatio="!w-[107px] !h-[66px] sm:!h-[66px] lg:!h-[66px] object-contain rounded min-h-auto"
         files={{}}
-        onDeleteFile={markDeletedMedia}
+        onDeleteFile={(key, path) => {
+          markDeletedMedia(key, path);
+          handleOnChange(fieldName, "");
+        }}
         onlyIcon
+        targetHeight={150}
+        targetWidth={250}
+        skipTool
       />
     );
   };
@@ -182,14 +199,23 @@ export default function ServiceSection({ data }: IProps) {
       title={name}
       addButton
       onAdd={addItem}
+      visible={visible}
     >
       <FormProvider
         onSubmit={(values) => {
           const newData = [
             //@ts-ignore
-            ...content?.data,
+            ...values?.content?.data,
           ].filter((val) => !deletedCards.includes(val.id));
-          handleSubmit({ content: { ...content, data: newData } });
+
+          //@ts-ignore
+          formData.content?.data?.forEach((value) => {
+            const dataIndex = newData.findIndex((val) => val.id === value.id);
+            if (dataIndex !== -1) newData[dataIndex].image = value.image;
+          });
+
+          // @ts-ignore
+          handleSubmit({ content: { ...values?.content, data: newData } });
         }}
         options={{
           defaultValues: formData,

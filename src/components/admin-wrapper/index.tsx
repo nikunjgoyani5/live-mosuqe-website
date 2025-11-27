@@ -14,6 +14,7 @@ import AboutPageSection from "./AboutPage";
 import FounderVisionSection from "./founder-vision";
 import EmpowerMasjidSection from "./empowering-masjid";
 import { useState } from "react";
+import DonationPageSection from "./DonationPage";
 
 interface IProps {
   data: ISections;
@@ -78,9 +79,10 @@ export default function AdminWrapper({ data }: IProps) {
           <LatestNewsSection data={data[SECTION_DATA_MAPING.LATEST_NEWS]} />
           <ServicesSection data={data[SECTION_DATA_MAPING.SERVICES]} />
           <AboutSection data={data[SECTION_DATA_MAPING.ABOUTUS]} />
-          {data[SECTION_DATA_MAPING.PRODUCTS].map((val) => (
-            <ProductsSection data={val} />
+          {data[SECTION_DATA_MAPING.PRODUCTS].map((val, i) => (
+            <ProductsSection data={val} key={val?._id} productIndex={i} />
           ))}
+          <DonationPageSection data={data[SECTION_DATA_MAPING.DONATION]} />
           <TestimonialsSection data={data[SECTION_DATA_MAPING.TESTIMONIALS]} />
           <ContactSection data={data[SECTION_DATA_MAPING.CONTACTUS]} />
           <FooterSection

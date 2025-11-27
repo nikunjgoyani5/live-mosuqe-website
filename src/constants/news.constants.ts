@@ -1,11 +1,4 @@
-export type NewsItem = {
-  id: number
-  title: string
-  excerpt: string
-  date: string // ISO string or display string
-  image: string
-  href?: string
-}
+import { NewsItem } from "./type.constants"
 
 export const featuredNews: NewsItem = {
   id: 0,

@@ -26,7 +26,6 @@ export const getSectionById = async (id: string) => {
 export const postSection = async (id: string, formData: object = {}) => {
   try {
     const data = await Http.patch(`/sections/${id}`, formData);
-    console.log("data----------------data", data);
     return data;
   } catch (e) {
     console.log("while getting sections", e);
@@ -48,10 +47,9 @@ export const manageMedia = async (
       `/files/manage`,
       formData
     );
-    console.log("data----------------data", data);
     return data;
   } catch (e) {
     console.log("while getting sections", e);
-    return { uploaded: [], deleted: [] };
+    throw e;
   }
 };

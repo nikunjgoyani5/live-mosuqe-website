@@ -3,7 +3,7 @@ import FoundersVision from "@/components/landing-wrapper/_components/aboutPage/F
 import Empowering from "@/components/landing-wrapper/_components/aboutPage/Empowering";
 // import Header from "@/components/landing-wrapper/_components/header";
 import Footer from "@/components/landing-wrapper/_components/footer";
-import { ISections, SECTION_DATA_MAPING } from "@/constants/section.constants";
+import { ISections, SECTION_DATA_MAPING, IHeaderContent } from "@/constants/section.constants";
 import { getSectionsList } from "@/services/section.service";
 
 export default async function AboutUsPage() {
@@ -21,7 +21,10 @@ export default async function AboutUsPage() {
       <AboutIntro data={aboutIntro} />
       <FoundersVision data={founderVision} />
       <Empowering data={empowering} />
-      <Footer data={data[SECTION_DATA_MAPING.FOOTER]} />
+      <Footer
+        data={data[SECTION_DATA_MAPING.FOOTER]}
+        socialLinks={(data[SECTION_DATA_MAPING.HEADER]?.content as IHeaderContent)?.info?.socials || []}
+      />
     </main>
   );
 }

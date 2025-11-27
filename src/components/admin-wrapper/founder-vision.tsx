@@ -5,18 +5,19 @@ import StateButton from "@/components/ui/StateButton";
 import FormProvider from "@/context/FormProvider";
 import TextInput from "@/components/ui/forms/TextInput";
 import { Trash2 } from "lucide-react";
-import { BASE_URL } from "@/lib/axios";
 import Image from "next/image";
 import { ISection } from "@/constants/section.constants";
 import TextareaField from "@/components/ui/forms/TextareaField";
 import SectionWrapper from "./_components/sectionWrapper";
+import ImageUploadField from "./_components/ImageUploadField";
+import { getFullImageUrl } from "@/lib/utils";
 
 interface IProps {
   data: ISection;
 }
 
 export default function FounderVisionSection({ data }: IProps) {
-  const { content, _id: sectionId, name } = data;
+  const { content, _id: sectionId, name, visible } = data;
   const {
     handleSubmit,
     formData,
@@ -40,7 +41,7 @@ export default function FounderVisionSection({ data }: IProps) {
 
   const addCount = uploadedCount + uploadMediaCount - markDeletedMediaCount;
   return (
-    <SectionWrapper sectionId={sectionId} title={name}>
+    <SectionWrapper sectionId={sectionId} title={name} visible={visible}>
       <FormProvider
         onSubmit={(value) => {
           handleSubmit({
@@ -49,6 +50,8 @@ export default function FounderVisionSection({ data }: IProps) {
               ...value.content,
               //@ts-ignore
               imagesData: { ...formData.content?.imagesData },
+              //@ts-ignore
+              media_url: formData.content?.media_url,
             },
           });
         }}
@@ -69,7 +72,7 @@ export default function FounderVisionSection({ data }: IProps) {
                         <Image
                           src={URL.createObjectURL(file)}
                           alt="Preview"
-                          className="w-full h-[300] sm:h-[400] lg:h-[400] object-cover rounded"
+                          className="w-full h-[300] sm:h-[400] lg:h-[400] object-contain rounded"
                           unoptimized
                           width={500}
                           height={500}
@@ -81,7 +84,7 @@ export default function FounderVisionSection({ data }: IProps) {
                           muted
                           loop
                           controls={false}
-                          className="w-full h-[300] sm:h-[400] lg:h-[400] object-cover rounded"
+                          className="w-full h-[300] sm:h-[400] lg:h-[400] object-contain rounded"
                         />
                       )}
                       <button
@@ -103,25 +106,25 @@ export default function FounderVisionSection({ data }: IProps) {
                   (formData.content as Record<string, string>).media_url
                 ) ? (
                   <Image
-                    src={`${BASE_URL}${
+                    src={`${getFullImageUrl(
                       (formData.content as Record<string, string>).media_url
-                    }`}
+                    )}`}
                     alt="Uploaded"
-                    className="w-full h-[300] sm:h-[400] lg:h-[400] object-cover rounded"
+                    className="w-full h-[300] sm:h-[400] lg:h-[400] object-contain rounded"
                     unoptimized
                     width={500}
                     height={500}
                   />
                 ) : (
                   <video
-                    src={`${BASE_URL}${
+                    src={`${getFullImageUrl(
                       (formData.content as Record<string, string>).media_url
-                    }`}
+                    )}`}
                     autoPlay
                     muted
                     loop
                     controls={false}
-                    className="w-full h-[300] sm:h-[400] lg:h-[400] object-cover rounded"
+                    className="w-full h-[300] sm:h-[400] lg:h-[400] object-contain rounded"
                   />
                 )}
                 <button
@@ -140,14 +143,32 @@ export default function FounderVisionSection({ data }: IProps) {
               </div>
             ) : (
               // 3️⃣ Nothing there yet → show Dropzone
-              <Dropzone
+              // <Dropzone
+              //   name="content.media_url"
+              //   files={{}}
+              //   onAddFile={addUploadMedia}
+              //   onDeleteFile={(key, path) => {
+              //     markDeletedMedia(key, path);
+              //   }}
+              //   existingFiles={[]}
+              // />
+              <ImageUploadField
                 name="content.media_url"
                 files={{}}
-                onAddFile={addUploadMedia}
+                uploadMedia={{}}
+                existingImagePath={null}
+                addUploadMedia={addUploadMedia}
                 onDeleteFile={(key, path) => {
                   markDeletedMedia(key, path);
+                  handleOnChange(key, "");
                 }}
                 existingFiles={[]}
+                markDeletedMedia={function (
+                  name: string,
+                  pathToDelete: string
+                ): void {
+                  markDeletedMedia(name, pathToDelete);
+                }}
               />
             )}
           </div>

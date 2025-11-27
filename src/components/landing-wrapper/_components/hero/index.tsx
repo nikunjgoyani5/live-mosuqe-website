@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { ISection, IHeroBannerContent } from "@/constants/section.constants";
+import { getFullImageUrl } from "@/lib/utils";
 import { he } from "zod/v4/locales";
 
 interface IProps {
@@ -24,14 +25,27 @@ export default function Hero({ data }: IProps) {
     setMounted(true);
   }, []);
 
+  if (!data?.visible) return null;
   // Extract hero banner content or fallback to dummy data
   const heroBannerContent = data?.content as unknown as IHeroBannerContent;
-  const carouselImages = heroBannerContent?.data || carouselItems.map(item => ({ type: 'image', url: item.image }));
-  const heroTitle = heroBannerContent?.hero_title || "NOT AN ORDINARY MUSLIM APP";
+  const carouselImages = heroBannerContent?.data
+    ? heroBannerContent.data.map((item) => ({
+        ...item,
+        url: getFullImageUrl(item.url),
+      }))
+    : carouselItems.map((item) => ({
+        type: "image",
+        url: getFullImageUrl(item.image),
+      }));
+  const heroTitle =
+    heroBannerContent?.hero_title || "NOT AN ORDINARY MUSLIM APP";
   const heroSubtitle = heroBannerContent?.hero_subtitle || "MUSLIM APP";
 
   return (
-    <div id="hero-section" className="scroll-section relative h-screen w-full overflow-hidden">
+    <div
+      id={data?.slug?.replace(/#/g, "") || "hero-section"}
+      className="scroll-section relative h-screen w-full overflow-hidden"
+    >
       {mounted && (
         <Carousel
           autoplay
@@ -48,7 +62,7 @@ export default function Hero({ data }: IProps) {
                   <Image
                     src={item.url}
                     alt={`Hero banner ${index + 1}`}
-                    className="absolute inset-0 h-full w-full object-cover"
+                    className="absolute inset-0 h-full w-full lg:object-cover object-cover object-top bg-[#F4F4F4]"
                     width={1920}
                     height={1080}
                   />
@@ -66,15 +80,35 @@ export default function Hero({ data }: IProps) {
       {/* Centered heading and button */}
       <div className="absolute z-10 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 text-center top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
         <div className="max-w-xs sm:max-w-lg md:max-w-3xl lg:max-w-4xl xl:max-w-5xl">
-          <h3 className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-4xl 2xl:text-6xl font-semibold leading-9 sm:leading-tight md:leading-tight lg:leading-tight xl:leading-20 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] font-cinzel-decorative tracking-wide mb-2">
+          <h3
+            className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-4xl 2xl:text-6xl font-semibold leading-9 sm:leading-tight md:leading-tight lg:leading-tight xl:leading-20 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] font-cinzel-decorative tracking-wide mb-2 text-center line-clamp-2 px-3"
+            style={{
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
             {heroTitle}
           </h3>
-          <h3 className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-4xl 2xl:text-6xl font-semibold leading-9 sm:leading-tight md:leading-tight lg:leading-tight xl:leading-20 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] font-cinzel-decorative tracking-wide mb-8">
+          <h3
+            className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-4xl 2xl:text-6xl font-semibold leading-9 sm:leading-tight md:leading-tight lg:leading-tight xl:leading-20 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] font-cinzel-decorative tracking-wide mb-8 text-center line-clamp-2 mx-auto"
+            style={{
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: "min(80vw, 520px)",
+            }}
+          >
             {heroSubtitle}
           </h3>
           <div className="mt-10">
-            <Button
-              className="bg-secondary-color border-0 shadow-none
+            <a href="https://live-mosque-form.web.app/signup">
+              <Button
+                className="bg-secondary-color border-0 shadow-none
                                             rounded-lg sm:rounded-lg
                                             cursor-pointer text-dark-100 hover:bg-secondary-color/80 
                                             text-sm sm:text-base md:text-lg font-medium
@@ -82,9 +116,10 @@ export default function Hero({ data }: IProps) {
                                             py-3 px-6 sm:py-4 sm:px-8 md:py-6 md:px-6
                                             transition-all duration-300 hover:scale-105 hover:shadow-lg
                                             focus:outline-none focus:ring-0 "
-            >
-              Register Your Masjid
-            </Button>
+              >
+                Register Your Masjid
+              </Button>
+            </a>
           </div>
         </div>
       </div>

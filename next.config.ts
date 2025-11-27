@@ -30,13 +30,18 @@ const nextConfig: NextConfig = {
       //   pathname: '/**',
       // },
       {
-        protocol: 'https',
-        hostname: 'livemosque-be.onrender.com',
-        pathname: '/uploads/**',
+        protocol: "https",
+        hostname: "livemosque-be.onrender.com",
+        pathname: "/uploads/**",
       },
       {
         protocol: "https",
         hostname: "livemosque-be.onrender.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
         pathname: "/**",
       },
     ],

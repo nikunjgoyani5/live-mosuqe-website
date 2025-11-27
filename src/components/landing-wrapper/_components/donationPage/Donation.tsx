@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { ISection } from "@/constants/section.constants";
+import { Button } from "@/components/ui/Button";
 import { getFullImageUrl } from "@/lib/utils";
 
 interface IProps {
@@ -14,13 +15,13 @@ const getMediaUrl = (url?: string) => {
   return getFullImageUrl(`${url}`);
 };
 
-export default function AboutIntro({ data }: IProps) {
+export default function Donation({ data }: IProps) {
   if (!data?.visible) return null;
   const content = (data?.content as Record<string, any>) || {};
   const title: string =
     content.title ||
     "Live Mosque - The service is completely free to any Masjid.";
-  const label: string = content.label || "About Us";
+  const label: string = content.label || "Donation";
   const description: string = content.description || "";
   const mediaUrl = getMediaUrl(content.media_url) || "/newsPage.png";
 
@@ -55,19 +56,6 @@ export default function AboutIntro({ data }: IProps) {
               className="w-full h-auto object-contain"
             />
           </div>
-
-          {/* Bottom-left badge card */}
-          <div className="absolute -bottom-6 left-6">
-            <div className="rounded-2xl bg-secondary-color text-dark-100 shadow-2xl px-6 py-5 max-w-[300px]">
-              <div className="text-2xl font-bold font-cinzel-decorative">
-                {years}
-              </div>
-              <p className="mt-1 text-sm leading-relaxed">
-                Years of contributing we invite you to become a part of the Live
-                Mosque community.
-              </p>
-            </div>
-          </div>
         </div>
 
         {/* Right: Copy */}
@@ -85,6 +73,21 @@ export default function AboutIntro({ data }: IProps) {
                 <p key={idx}>{line}</p>
               ))}
           </div>
+          {/* <Button
+            asChild
+            className="bg-secondary-color border-0 shadow-none
+                                            rounded-lg sm:rounded-lg
+                                            cursor-pointer text-dark-100 hover:bg-secondary-color/80 
+                                            text-sm sm:text-base md:text-lg font-medium
+                                            font-montserrat
+                                            py-3 px-6 sm:py-4 sm:px-8 md:py-6 md:px-6
+                                            transition-all duration-300 hover:scale-105 hover:shadow-lg
+                                            focus:outline-none focus:ring-0 "
+          >
+            <a href={content?.path || "#"} target="_blank">
+              {content?.btnText || "Donate now"}
+            </a>
+          </Button> */}
         </div>
       </div>
     </section>

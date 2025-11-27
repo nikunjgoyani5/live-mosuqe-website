@@ -1,3 +1,6 @@
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
+
 import LandinnWrapper from "@/components/landing-wrapper";
 import { ISections } from "@/constants/section.constants";
 import { getSectionsList } from "@/services/section.service";
@@ -11,7 +14,7 @@ export default async function Home() {
     await delay(2000);
     data = await getSectionsList();
   } catch (error) {
-    console.warn('API call failed during build, using fallback data:', error);
+    console.warn("API call failed during build, using fallback data:", error);
     // Fallback to null, components should handle this gracefully
     data = null;
   }

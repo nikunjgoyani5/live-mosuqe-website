@@ -43,7 +43,7 @@ export default function Card({
         <div className="flex justify-center">
           <div className="relative">
             {/* Decorative top image */}
-            <div className="absolute z-10 bottom-[100%] left-1/2 transform -translate-x-1/2">
+            <div className="absolute z-10 bottom-[100%] left-1/2 transform -translate-x-1/2 mb-[-1px]">
               <Image
                 src={"/taj4.svg"}
                 alt={"taj4.svg"}
@@ -62,7 +62,7 @@ export default function Card({
                     <Image
                       src={String(finalCardData.mainImage?.src)}
                       alt={String(finalCardData.mainImage?.alt)}
-                      className="w-full h-40 md:max-h-20 object-cover rounded-xl"
+                      className="w-full h-40 md:max-h-20 object-contain rounded-xl"
                       width={200}
                       height={200}
                     />
@@ -70,7 +70,7 @@ export default function Card({
                 )}
 
                 {/* Text section */}
-                <div className="flex flex-col justify-center gap-2 w-full h-full">
+                <div className="flex flex-col justify-center gap-2 w-full h-full overflow-hidden ">
                   {finalCardData.title && (
                     <div
                       className={`${finalCardData.styles?.titleFont} font-bold ${finalCardData.styles?.titleColor} text-xl md:text-2xl text-center md:text-left`}
@@ -79,9 +79,15 @@ export default function Card({
                     </div>
                   )}
                   <div
-                    className={`${finalCardData.styles?.descriptionFont} text-dark-100 leading-5.5 text-sm font-medium md:text-left flex-1 flex font-montserrat `}
+                    title={finalCardData?.description}
+                    className={`${finalCardData.styles?.descriptionFont} text-dark-100 leading-5.5 text-sm font-medium md:text-left font-montserrat overflow-hidden text-ellipsis cursor-default `}
+                    style={{
+                      display: "-webkit-box",
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: "vertical",
+                    }}
                   >
-                    {finalCardData.description}
+                    {finalCardData?.description}
                   </div>
                 </div>
               </div>

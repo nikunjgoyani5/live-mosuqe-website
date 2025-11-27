@@ -1,5 +1,6 @@
 import { useState, useRef, useMemo, useEffect } from "react";
 import { manageMedia, postSection } from "@/services/section.service";
+import toast from "react-hot-toast";
 
 type FormValue = object | string | unknown;
 
@@ -102,20 +103,52 @@ export function useSection(
   const [openForms, setOpenForms] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  /** add file to uploadMedia */
-  const addUploadMedia = (key: string, file: File) => {
-    setUploadMedia((prev) => ({ ...prev, [key]: file }));
+  /** add file to uploadMedia with validation */
+  const addUploadMedia = async (key: string, file: File) => {
+    try {
+      // Validate MIME type
+      const allowedMimeTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "video/mp4",
+        "video/avi",
+        "video/mov",
+      ];
+      if (!allowedMimeTypes.includes(file.type)) {
+        throw new Error(
+          "Unsupported file format. Please upload a JPEG, PNG, GIF, MP4, AVI, or MOV."
+        );
+      }
+
+      // Validate file size (e.g., max 20MB)
+      const maxSizeInMB = 20;
+      if (file.size > maxSizeInMB * 1024 * 1024) {
+        throw new Error(
+          `File size exceeds ${maxSizeInMB}MB. Please upload a smaller file.`
+        );
+      }
+
+      // If all validations pass, add the file to uploadMedia
+      setUploadMedia((prev) => ({ ...prev, [key]: file }));
+    } catch (error: any) {
+      toast.error(error.message || "Failed to upload file. Please try again.");
+    }
   };
 
   /** mark media for deletion (supports nested keys via dot notation) */
-  const markDeletedMedia = (key: string | string[], path?: string) => {
+  const markDeletedMedia = (
+    key: string | string[],
+    path?: string,
+    formDataSave: boolean = true
+  ) => {
     if (path) setDeletedMedias((prev) => [...prev, path]);
     if (!path)
       setUploadMedia((prev) => {
         if (typeof key === "string") delete prev[key];
         return prev;
       });
-    setFormData((prev) => setNestedValue(prev, key, ""));
+    if (formDataSave) setFormData((prev) => setNestedValue(prev, key, ""));
   };
 
   const handleOnChange = (name: string, value: FormValue) => {
@@ -142,11 +175,14 @@ export function useSection(
         formDataToSend.append("files", file);
       });
 
-      const { uploaded } = await manageMedia(sectionId, formDataToSend);
+      const { uploaded, deleted } = await manageMedia(
+        sectionId,
+        formDataToSend
+      );
 
-      return { uploaded };
+      return { uploaded, deleted };
     }
-    return { uploaded: [] };
+    return { uploaded: [], deleted: [] };
   };
 
   const handleSubmitMedias = async () => {
@@ -169,10 +205,12 @@ export function useSection(
 
         console.log("uploaded file paths", filePaths);
 
-        const keys = Object.keys(uploadMedia);
-        keys.forEach((k, idx) => {
-          postData = setNestedValue(postData, k, filePaths[idx], true);
-        });
+        if (filePaths.length) {
+          const keys = Object.keys(uploadMedia);
+          keys.forEach((k, idx) => {
+            postData = setNestedValue(postData, k, filePaths[idx], true);
+          });
+        }
 
         setFormData(postData);
         setUploadMedia({});
@@ -185,20 +223,18 @@ export function useSection(
       initialRef.current = postData;
     } catch (err) {
       console.error("while update section", err);
+      setUploadMedia({});
+      setDeletedMedias([]);
+      toast.error("media upload failed, please try again!");
     } finally {
       setLoading(false);
       setOpenForms(false);
     }
   };
-  console.log(
-    "triggering media management-uploadMedia---uploadMedia-->>",
-    uploadMedia
-  );
 
   const handleSubmit = async (values: FormDataState) => {
     setLoading(true);
     let postData = { ...values };
-    console.log("values", values);
 
     try {
       if (Object.keys(uploadMedia).length > 0 || deletedMedias.length > 0) {
@@ -207,10 +243,12 @@ export function useSection(
           deletedMedias: deletedMedias,
         });
 
-        const keys = Object.keys(uploadMedia);
-        keys.forEach((k, idx) => {
-          postData = setNestedValue(postData, k, filePaths[idx], true);
-        });
+        if (filePaths.length) {
+          const keys = Object.keys(uploadMedia);
+          keys.forEach((k, idx) => {
+            postData = setNestedValue(postData, k, filePaths[idx], true);
+          });
+        }
 
         setUploadMedia({});
         setDeletedMedias([]);
@@ -222,11 +260,14 @@ export function useSection(
       // ✅ after successful submit, update initialRef to current data
       initialRef.current = postData;
       refetch && refetch();
-    } catch (err) {
+    } catch (err: any) {
       console.error("while update section", err);
+      setUploadMedia({});
+      setDeletedMedias([]);
+      toast.error(err?.message || "Error updating section. Please try again.");
     } finally {
       setLoading(false);
-      toggleForm();
+      setOpenForms(false);
     }
   };
 

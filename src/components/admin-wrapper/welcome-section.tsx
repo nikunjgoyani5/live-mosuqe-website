@@ -9,7 +9,7 @@ function WelcomeSection() {
           <Image
             src="/logo.png"
             alt="Logo"
-            className="w-10 h-10 xl:w-14 xl:h-14 rounded-lg"
+            className="w-20 h-10 [@media(min-width:426px)]:w-14 [@media(min-width:426px)]:h-10 sm:w-10 sm:h-10 xl:w-14 xl:h-14 rounded-lg"
             width={70}
             height={70}
           />
@@ -21,7 +21,7 @@ function WelcomeSection() {
           <Image
             src="/user.svg"
             alt="User"
-            className="w-8 h-8 xl:w-8 xl:h-8 rounded-lg"
+            className="w-20 h-7 sm:w-8 sm:h-8 xl:w-8 xl:h-8 rounded-lg"
             width={34}
             height={34}
           />

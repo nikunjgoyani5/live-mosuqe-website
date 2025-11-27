@@ -29,6 +29,7 @@ export default function TextareaField({
       {label ? (
         <label htmlFor={name} className="text-dark-100 font-medium">
           {label}
+          {required ? <span className="text-red-500 ml-1">*</span> : null}
         </label>
       ) : null}
       <textarea
@@ -39,7 +40,7 @@ export default function TextareaField({
         aria-invalid={!!err}
         suppressHydrationWarning={true}
         {...register(name)}
-        required={required}
+      // Do not pass native required to avoid browser tooltip
       />
       {err ? <p className="text-red-500 text-xs">{err}</p> : null}
     </div>
