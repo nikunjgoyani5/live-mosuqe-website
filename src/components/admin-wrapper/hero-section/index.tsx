@@ -34,6 +34,8 @@ export default function HeroSection({ data }: IProps) {
     },
     sectionId
   );
+  const [isLoading, setIsLoading] = useState(false);
+  const [files, setFiles] = useState([]);
   const { selectedIndex, onDotButtonClick } = useDotButton(emblaApi);
 
   const onAddHandler = () => {
@@ -43,23 +45,11 @@ export default function HeroSection({ data }: IProps) {
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
-      let postData = {
-        content: {
-          ...content,
-          //@ts-ignore
-          data: Array.isArray(content?.data)
-            ? //@ts-ignore
-              content?.data
-            : [],
-        },
-      };
-
-      const files = e.target.files;
-      if (!files || files.length === 0) return;
+      const filesUp = e.target.files;
+      if (!filesUp || filesUp.length === 0) return;
 
       //@ts-ignore
-      const lastIndex = formData.content?.data?.length || 0;
-      const file = files[0];
+      const file = filesUp[0];
 
       // ✅ Step 1: Compress the image if it's an image type
       let finalFile = file;
@@ -82,34 +72,20 @@ export default function HeroSection({ data }: IProps) {
           console.error("❌ Image compression failed:", err);
         }
       }
-
-      const uploadMedia = { [`content.data[${lastIndex}]`]: finalFile };
-      const { uploaded: filePaths } = await handleTriggerManageMedia({
-        uploadMedia,
-        deletedMedias: [],
-      });
-
-      if (filePaths.length) {
-        const keys = Object.keys(uploadMedia);
-        keys.forEach((k, idx) => {
-          if (filePaths[idx]) {
-            postData = setNestedValue(
-              postData,
-              k,
-              {
-                type: getMediaTypeFromPath(filePaths[idx]),
-                url: filePaths[idx],
-              },
-              true
-            );
-          }
-        });
-      }
-
-      await handleSubmit(postData);
-      e.target.value = "";
-      onDotButtonClick(lastIndex);
-      console.log("✅ Uploaded file:", finalFile);
+      const fileData = {
+        file: finalFile,
+        url: URL.createObjectURL(finalFile), // Generate a preview URL for the file
+        name: finalFile.name,
+        timestamp: Date.now(), // Add a timestamp for sorting
+        type: finalFile.type.startsWith("image/") ? "image" : "video", // Determine if the file is an image or video
+      };
+      const newFiles = [...files, fileData];
+      //@ts-ignore
+      setFiles(newFiles);
+      setTimeout(() => {
+        //@ts-ignore
+        onDotButtonClick([...newFiles, ...formData.content?.data]?.length - 1);
+      }, 700);
     } catch (err: any) {
       toast.error(err?.message || "Image upload failed, please try again!");
     }
@@ -120,17 +96,80 @@ export default function HeroSection({ data }: IProps) {
     const lastIndex = selectedIndex || 0;
 
     //@ts-ignore
-    const filePath: string = formData.content?.data?.[lastIndex]?.url;
+    if (lastIndex > formData.content?.data?.length - 1) {
+      //@ts-ignore
+      const removeIndex = lastIndex - formData.content?.data?.length;
+      //@ts-ignore
+      setFiles((prevFiles: any[]) =>
+        prevFiles.filter((_, i) => i !== removeIndex)
+      );
+    } else {
+      //@ts-ignore
+      const filePath: string = formData.content?.data?.[lastIndex]?.url;
 
-    if (filePath) {
-      markDeletedMedia("deletePath", filePath, false);
-      // @ts-ignore
-      const newArr = formData.content.data.filter(
-        (_: unknown, i: number) => i !== lastIndex
+      if (filePath) {
+        markDeletedMedia("deletePath", filePath, false);
+        // @ts-ignore
+        const newArr = formData.content.data.filter(
+          (_: unknown, i: number) => i !== lastIndex
+        );
+
+        handleOnChange("content.data", newArr);
+        if (selectedIndex === lastIndex) onDotButtonClick(0);
+      }
+    }
+  };
+
+  const handleSubmitHandler = async (values: any) => {
+    setIsLoading(true);
+    try {
+      //@ts-ignore
+      const bannerPaths = Array.isArray(formData.content?.data)
+        ? //@ts-ignore
+          formData.content?.data
+        : [];
+
+      // Sort files by timestamp before mapping
+      const sortedFiles = [...files].sort(
+        (a: any, b: any) => a.timestamp - b.timestamp
       );
 
-      handleOnChange("content.data", newArr);
-      if (selectedIndex === lastIndex) onDotButtonClick(0);
+      // map for uploadMedia
+      const mapFiles = sortedFiles.reduce(
+        (acc: any, fileData: any, index: number) => {
+          acc[`content.data[${fileData.name + index}]`] = fileData.file;
+          return acc;
+        },
+        {}
+      );
+
+      const { uploaded: filePaths } = await handleTriggerManageMedia({
+        uploadMedia: mapFiles,
+        deletedMedias: [],
+      });
+
+      if (filePaths.length) {
+        bannerPaths.push(
+          ...filePaths?.map((path) => ({
+            type: getMediaTypeFromPath(path),
+            url: path,
+          }))
+        );
+      }
+
+      await handleSubmit({
+        content: {
+          //@ts-ignore
+          ...values?.content,
+          //@ts-ignore
+          data: bannerPaths,
+        },
+      });
+      setFiles([]);
+    } catch (e) {
+      console.log("error");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -150,19 +189,7 @@ export default function HeroSection({ data }: IProps) {
         onChange={handleImageUpload}
       />
       <FormProvider
-        onSubmit={(values) => {
-          handleSubmit({
-            content: {
-              //@ts-ignore
-              ...values?.content,
-              //@ts-ignore
-              data: Array.isArray(formData.content?.data)
-                ? //@ts-ignore
-                  formData.content?.data
-                : [],
-            },
-          });
-        }}
+        onSubmit={handleSubmitHandler}
         options={{
           defaultValues: formData,
         }}
@@ -174,16 +201,17 @@ export default function HeroSection({ data }: IProps) {
             //@ts-ignore
             Array.isArray(formData.content?.data) ? formData.content?.data : []
           }
+          uploadedMedias={files}
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-5">
           <TextInput name="content.hero_title" label="Hero title" />
           <TextInput name="content.hero_subtitle" label="Sub title" />
         </div>
         <StateButton
-          loading={loading}
+          loading={loading || isLoading}
           type="submit"
           className="mt-4"
-          disabled={loading}
+          disabled={loading || isLoading}
           id="save-hero-section"
         >
           Save

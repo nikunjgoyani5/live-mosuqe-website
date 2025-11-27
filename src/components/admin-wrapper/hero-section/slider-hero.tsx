@@ -24,7 +24,9 @@ function SliderHeroForm({
   data,
   onDelete,
   setCarouselApi,
+  uploadedMedias,
 }: {
+  uploadedMedias?: any[];
   data?: any;
   onDelete: () => void;
   setCarouselApi: (api: CarouselApi) => void;
@@ -55,6 +57,37 @@ function SliderHeroForm({
                 (item: any, i: number) =>
                   item.url && (
                     <CarouselItem key={i} className="basis-full">
+                      <div className="relative xl:h-[900px] h-screen w-full">
+                        {item.type === "video" ? (
+                          <video
+                            src={`${getFullImageUrl(item.url)}`}
+                            autoPlay
+                            muted
+                            loop
+                            controls={false}
+                            className="absolute inset-0 h-full w-full object-cover"
+                          />
+                        ) : (
+                          <Image
+                            src={`${getFullImageUrl(item.url)}`}
+                            alt={item.url}
+                            className="absolute inset-0 h-full w-full object-cover"
+                            width={1920}
+                            height={1080}
+                            priority
+                          />
+                        )}
+
+                        {/* Optional overlay for readability */}
+                        <div className="absolute inset-0 bg-black/20" />
+                      </div>
+                    </CarouselItem>
+                  )
+              )}
+              {uploadedMedias?.map(
+                (item: any, i: number) =>
+                  item.url && (
+                    <CarouselItem key={data?.length + i} className="basis-full">
                       <div className="relative xl:h-[900px] h-screen w-full">
                         {item.type === "video" ? (
                           <video
