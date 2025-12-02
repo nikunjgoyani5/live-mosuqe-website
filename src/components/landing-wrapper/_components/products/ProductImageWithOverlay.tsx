@@ -30,6 +30,7 @@ const ProductImageWithOverlayComponent: React.FC<Props> = ({
   const getDeviceConfig = (deviceIndex: number) => {
     switch (deviceIndex) {
       case 0:
+      case 4:
         return {
           containerClasses: "items-end justify-center pb-6",
           deviceClasses: "w-48 h-32 lg:w-[65%] lg:h-[45%] overflow-visible",
@@ -57,8 +58,8 @@ const ProductImageWithOverlayComponent: React.FC<Props> = ({
         } as const;
       default:
         return {
-          containerClasses: "items-center justify-center",
-          deviceClasses: "w-32 h-24 overflow-visible",
+          containerClasses: "items-end justify-start pl-8 pb-10",
+          deviceClasses: "w-36 h-44 lg:w-[37%] lg:h-[60%] overflow-visible",
           screenClasses: "w-full h-full",
         } as const;
     }
@@ -71,6 +72,7 @@ const ProductImageWithOverlayComponent: React.FC<Props> = ({
     switch (deviceIndex) {
       // Laptop/Screen
       case 0:
+      case 4:
         return (
           <div className="device device-laptop">
             <div className="device-bezel">
@@ -109,9 +111,12 @@ const ProductImageWithOverlayComponent: React.FC<Props> = ({
         );
       default:
         return (
-          <div className="device device-generic">
-            <div className="device-bezel">
-              <div className="screen overflow-hidden">{children}</div>
+          <div className="device device-tablet taj-card-shadow">
+            <div className="device-camera z-99" />
+            <div className="device-bezel ">
+              <div className="screen rounded-[14px] overflow-hidden">
+                {children}
+              </div>
             </div>
           </div>
         );

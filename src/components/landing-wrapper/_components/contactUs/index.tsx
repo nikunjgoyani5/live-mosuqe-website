@@ -23,6 +23,7 @@ import Image from "next/image";
 import { ISection, IContactContent } from "@/constants/section.constants";
 import { sendContactMessage, SendMessagePayload } from "@/services/contact";
 import toast from "react-hot-toast";
+import ReCAPTCHA from "react-google-recaptcha";
 
 interface IProps {
   data?: ISection;
@@ -247,6 +248,7 @@ export default function ContactSection({ data }: IProps) {
   });
   const { handleSubmit } = methods;
   const [submitting, setSubmitting] = useState(false);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
 
   const onSubmit = async (values: Record<string, unknown>) => {
     try {
@@ -333,9 +335,21 @@ export default function ContactSection({ data }: IProps) {
                   </div>
                 ))}
               </div>
+              {/* Add reCAPTCHA */}
+              <div className="mt-4">
+                {/* https://developers.google.com/recaptcha/intro generate site key from here */}
+                <ReCAPTCHA
+                  sitekey={
+                    process.env?.NEXT_PUBLIC_SITE_KEY ||
+                    "6LdbMR8sAAAAAJat-0lazApFuURRgK5mChNDiGBZ"
+                  } // Replace with your site key
+                  onChange={(value) => setCaptchaVerified(!!value)}
+                  onExpired={() => setCaptchaVerified(false)}
+                />
+              </div>
               <PrimaryButton
                 type="submit"
-                disabled={submitting}
+                disabled={submitting || !captchaVerified} // Disable if captcha not verified
                 className="disabled:opacity-60"
               >
                 {submitting ? "Sending..." : left?.submitText ?? "Submit"}

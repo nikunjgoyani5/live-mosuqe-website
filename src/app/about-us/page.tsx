@@ -3,8 +3,15 @@ import FoundersVision from "@/components/landing-wrapper/_components/aboutPage/F
 import Empowering from "@/components/landing-wrapper/_components/aboutPage/Empowering";
 // import Header from "@/components/landing-wrapper/_components/header";
 import Footer from "@/components/landing-wrapper/_components/footer";
-import { ISections, SECTION_DATA_MAPING, IHeaderContent } from "@/constants/section.constants";
+import {
+  ISections,
+  SECTION_DATA_MAPING,
+  IHeaderContent,
+} from "@/constants/section.constants";
 import { getSectionsList } from "@/services/section.service";
+
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
 
 export default async function AboutUsPage() {
   const data: ISections | null = await getSectionsList();
@@ -23,7 +30,10 @@ export default async function AboutUsPage() {
       <Empowering data={empowering} />
       <Footer
         data={data[SECTION_DATA_MAPING.FOOTER]}
-        socialLinks={(data[SECTION_DATA_MAPING.HEADER]?.content as IHeaderContent)?.info?.socials || []}
+        socialLinks={
+          (data[SECTION_DATA_MAPING.HEADER]?.content as IHeaderContent)?.info
+            ?.socials || []
+        }
       />
     </main>
   );
