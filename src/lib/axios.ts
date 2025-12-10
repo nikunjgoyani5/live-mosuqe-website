@@ -1,5 +1,5 @@
 import axios from "axios";
-// import { cookies } from "next/headers";
+import Cookies from "js-cookie";
 
 // Normalize base URL: trim spaces and avoid double trailing slashes
 function normalizeBase(url: string) {
@@ -19,10 +19,11 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use(async (config) => {
-  // const token = (await cookies()).get("token")?.value; // server-side cookie read
-  // if (token) {
-  //   config.headers.Authorization = `Bearer ${token}`;
-  // }
+  // Get token from client-side cookie
+  const token = Cookies.get("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
   return config;
 });
 

@@ -3,7 +3,13 @@ import Cookies from "js-cookie";
 
 // set cookie
 export const setCookie = (name: string, value: string, days = 7) => {
-  Cookies.set(name, value, { expires: days, sameSite: "strict" });
+  Cookies.set(name, value, {
+    expires: days,
+    sameSite: "none",
+    secure: true,
+    domain:
+      process.env.NODE_ENV === "production" ? ".livemosque.live" : undefined,
+  });
 };
 
 // get cookie
