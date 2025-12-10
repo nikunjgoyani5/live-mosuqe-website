@@ -56,7 +56,7 @@ export default function HeroSection({ data }: IProps) {
       if (file.type.startsWith("image/")) {
         try {
           const options = {
-            maxSizeMB: 1, // target ~1MB
+            maxSizeMB: 10, // target ~10MB
             maxWidthOrHeight: 1920, // resize large images
             useWebWorker: true,
           };
@@ -72,6 +72,30 @@ export default function HeroSection({ data }: IProps) {
           console.error("❌ Image compression failed:", err);
         }
       }
+
+      // Validate MIME type
+      const allowedMimeTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "video/mp4",
+        "video/avi",
+        "video/mov",
+      ];
+      if (!allowedMimeTypes.includes(file.type)) {
+        throw new Error(
+          "Unsupported file format. Please upload a JPEG, PNG, GIF, MP4, AVI, or MOV."
+        );
+      }
+
+      // Validate file size (e.g., max 10MB)
+      const maxSizeInMB = 10;
+      if (file.size > maxSizeInMB * 1024 * 1024) {
+        throw new Error(
+          `File size exceeds ${maxSizeInMB}MB. Please upload a smaller file.`
+        );
+      }
+
       const fileData = {
         file: finalFile,
         url: URL.createObjectURL(finalFile), // Generate a preview URL for the file

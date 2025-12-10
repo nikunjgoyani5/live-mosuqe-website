@@ -11,6 +11,9 @@ import TextareaField from "@/components/ui/forms/TextareaField";
 import SectionWrapper from "./_components/sectionWrapper";
 import ImageUploadField from "./_components/ImageUploadField";
 import { getFullImageUrl } from "@/lib/utils";
+import ProductVariantsForm from "./products-section/product-variants-form";
+import DownloadVariantsForm from "./products-section/download-variants-form";
+import VideoFeatureProduct from "./products-section/videoFeature";
 
 interface IProps {
   data: ISection;
@@ -170,6 +173,10 @@ export default function DonationPageSection({ data }: IProps) {
             <TextareaField name={`content.description`} label="Description" />
             {/* <TextInput name="content.btnText" label="Button Text" />
             <TextInput name="content.path" label="Path" /> */}
+            <ProductVariantsForm />
+            <DownloadVariantsForm />
+            <TextInput name="content.downloadText" label="Download It Free" />
+            <VideoFeatureProduct />
           </div>
         </div>
 

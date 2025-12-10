@@ -4,6 +4,9 @@ import Image from "next/image";
 import { ISection } from "@/constants/section.constants";
 import { Button } from "@/components/ui/Button";
 import { getFullImageUrl } from "@/lib/utils";
+import { MdOndemandVideo } from "react-icons/md";
+import { PlatformGrid } from "../products/PlatformGrid";
+import { DownloadAndShare } from "../products/DownloadAndShare";
 
 interface IProps {
   data?: ISection;
@@ -24,12 +27,38 @@ export default function Donation({ data }: IProps) {
   const label: string = content.label || "Donation";
   const description: string = content.description || "";
   const mediaUrl = getMediaUrl(content.media_url) || "/newsPage.png";
+  const videoPath = content?.videoPath;
+  const isVideoEnabled = content?.isVideoEnabled;
+  const videoBtnText = content?.videoBtnText;
+
+  const platforms = Array.isArray(content?.platforms)
+    ? content?.platforms.map((p) => ({
+        name: p.name,
+        image: getFullImageUrl(p.image),
+        link: p.link,
+      }))
+    : [];
+
+  const downloadPlatforms = Array.isArray(content?.downloadPlatforms)
+    ? content?.downloadPlatforms.map((p) => ({
+        name: p.name,
+        image: getFullImageUrl(p.image),
+        link: p.link,
+      }))
+    : [];
+
+  const platformTitle =
+    platforms.length > 0 ? "Order pre-installed Masjid Clock box" : undefined;
+  const downloadText = content?.downloadText;
 
   // Simple year badge value; default shows 03+, but allow overriding via content.years
   const years: string = content.years || "03+";
 
   return (
-    <section className="w-full bg-white py-16 md:py-24">
+    <section
+      id={data?.slug?.replace(/#/g, "") || "donation"}
+      className="w-full bg-white py-16 md:py-24"
+    >
       <div className="flex flex-col gap-3 mb-3 w-full justify-center items-center">
         <Image
           src="/Searviceheader.png"
@@ -88,6 +117,26 @@ export default function Donation({ data }: IProps) {
               {content?.btnText || "Donate now"}
             </a>
           </Button> */}
+          {videoPath && isVideoEnabled && (
+            <div className="flex items-center gap-5">
+              {videoPath && isVideoEnabled && (
+                <a
+                  href={videoPath || "#"}
+                  target="_blank"
+                  className="rounded-lg cursor-pointer bg-primary-color px-5 py-2 sm:px-6 sm:py-3 text-sm font-medium text-white hover:bg-primary-color/90 flex items-center gap-2 w-fit "
+                >
+                  <MdOndemandVideo fontSize={20} />
+                  {videoBtnText || "Video"}
+                </a>
+              )}
+            </div>
+          )}
+          <PlatformGrid platforms={platforms} platformTitle={platformTitle} />
+          <DownloadAndShare
+            downloadPlatforms={downloadPlatforms}
+            slug={data?.slug}
+            downloadText={downloadText}
+          />
         </div>
       </div>
     </section>

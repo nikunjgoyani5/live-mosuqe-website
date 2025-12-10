@@ -57,7 +57,7 @@ export default function AboutIntro({ data }: IProps) {
           </div>
 
           {/* Bottom-left badge card */}
-          <div className="absolute -bottom-6 left-6">
+          {/* <div className="absolute -bottom-6 left-6">
             <div className="rounded-2xl bg-secondary-color text-dark-100 shadow-2xl px-6 py-5 max-w-[300px]">
               <div className="text-2xl font-bold font-cinzel-decorative">
                 {years}
@@ -67,7 +67,7 @@ export default function AboutIntro({ data }: IProps) {
                 Mosque community.
               </p>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Right: Copy */}

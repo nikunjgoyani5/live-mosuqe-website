@@ -34,42 +34,43 @@ const ProductComponent = ({ data }: IProps) => {
             };
 
           const imageSrc = getFullImageUrl(
-            productContent.media_url ||
-              (productContent.images && productContent.images[0]) ||
+            productContent?.media_url ||
+              (productContent?.images && productContent?.images[0]) ||
               "/product1.png"
           );
 
           // const carouselImages = Array.isArray(productContent.images) ? productContent.images.map(getFullImageUrl) : [];
 
-          const modelImage = Array.isArray(
-            Object.values(productContent.modalImages)
-          )
-            ? Object.values(productContent.modalImages)
-                .filter(
-                  (image) =>
-                    image && typeof image === "string" && image.trim() !== ""
-                ) // Remove empty, null, undefined, or whitespace-only values
-                .map(getFullImageUrl)
-            : [];
+          const modelImage =
+            productContent?.modalImages &&
+            Array.isArray(Object.values(productContent.modalImages))
+              ? Object.values(productContent.modalImages)
+                  .filter(
+                    (image) =>
+                      image && typeof image === "string" && image.trim() !== ""
+                  ) // Remove empty, null, undefined, or whitespace-only values
+                  .map(getFullImageUrl)
+              : [];
 
-          const carouselImages = Array.isArray(
-            Object.values(productContent.imagesData)
-          )
-            ? Object.values(productContent.imagesData)
-                .filter(
-                  (image) =>
-                    image && typeof image === "string" && image.trim() !== ""
-                ) // Remove empty, null, undefined, or whitespace-only values
-                .map(getFullImageUrl)
-            : [];
+          const carouselImages =
+            productContent?.imagesData &&
+            Array.isArray(Object.values(productContent.imagesData))
+              ? Object.values(productContent.imagesData)
+                  .filter(
+                    (image) =>
+                      image && typeof image === "string" && image.trim() !== ""
+                  ) // Remove empty, null, undefined, or whitespace-only values
+                  .map(getFullImageUrl)
+              : [];
 
-          const platforms = Array.isArray(productContent.platforms)
-            ? productContent.platforms.map((p) => ({
-                name: p.name,
-                image: getFullImageUrl(p.image),
-                link: p.link,
-              }))
-            : [];
+          const platforms =
+            productContent?.platforms && Array.isArray(productContent.platforms)
+              ? productContent.platforms.map((p) => ({
+                  name: p.name,
+                  image: getFullImageUrl(p.image),
+                  link: p.link,
+                }))
+              : [];
 
           const downloadPlatforms = Array.isArray(
             productContent.downloadPlatforms
