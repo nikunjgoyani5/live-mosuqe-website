@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 function WelcomeSection() {
@@ -17,7 +18,7 @@ function WelcomeSection() {
         <h1 className="xl:text-[25px] text-xl font-semibold">
           Welcome to Live Mosque
         </h1>
-        <div className="flex items-center">
+        <Link href="/admin/settings" className="flex items-center">
           <Image
             src="/user.svg"
             alt="User"
@@ -25,7 +26,7 @@ function WelcomeSection() {
             width={34}
             height={34}
           />
-        </div>
+        </Link>
       </div>
     </div>
   );

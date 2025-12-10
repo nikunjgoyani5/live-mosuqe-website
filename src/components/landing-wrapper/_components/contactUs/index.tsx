@@ -249,8 +249,14 @@ export default function ContactSection({ data }: IProps) {
   const { handleSubmit } = methods;
   const [submitting, setSubmitting] = useState(false);
   const [captchaVerified, setCaptchaVerified] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const onSubmit = async (values: Record<string, unknown>) => {
+    if (!captchaVerified || !captchaToken) {
+      toast.error("Please verify that you are not a robot.");
+      return;
+    }
+
     try {
       setSubmitting(true);
       // Map dynamic field names to API expected keys
@@ -274,12 +280,26 @@ export default function ContactSection({ data }: IProps) {
       // Fire API call
       await sendContactMessage(payload);
       toast.success("Message sent successfully.");
+      // Reset form and captcha
+      methods.reset();
+      setCaptchaVerified(false);
+      setCaptchaToken(null);
     } catch (error) {
       console.error("Failed to send message", error);
       toast.error("Failed to send message. Please try again later.");
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleCaptchaChange = (token: string | null) => {
+    setCaptchaToken(token);
+    setCaptchaVerified(!!token);
+  };
+
+  const handleCaptchaExpired = () => {
+    setCaptchaToken(null);
+    setCaptchaVerified(false);
   };
 
   const left = config?.left;
@@ -336,21 +356,22 @@ export default function ContactSection({ data }: IProps) {
                 ))}
               </div>
               {/* Add reCAPTCHA */}
-              <div className="mt-4">
-                {/* https://developers.google.com/recaptcha/intro generate site key from here */}
+              <div className="mt-4 flex justify-center sm:justify-start">
+                {/* https://developers.google.com/recaptcha/intro generate site key from here https://www.google.com/recaptcha/admin/site/740784298 */}
                 <ReCAPTCHA
                   sitekey={
-                    process.env?.NEXT_PUBLIC_SITE_KEY ||
-                    "6LdbMR8sAAAAAJat-0lazApFuURRgK5mChNDiGBZ"
-                  } // Replace with your site key
-                  onChange={(value) => setCaptchaVerified(!!value)}
-                  onExpired={() => setCaptchaVerified(false)}
+                    process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ||
+                    "6LeqeCcsAAAAAFScFpKDOMe0ZohEEG_wjrgVOKTu"
+                  }
+                  onChange={handleCaptchaChange}
+                  onExpired={handleCaptchaExpired}
+                  onErrored={handleCaptchaExpired}
                 />
               </div>
               <PrimaryButton
                 type="submit"
-                disabled={submitting || !captchaVerified} // Disable if captcha not verified
-                className="disabled:opacity-60"
+                disabled={submitting || !captchaVerified}
+                className="disabled:opacity-60 w-full sm:w-auto"
               >
                 {submitting ? "Sending..." : left?.submitText ?? "Submit"}
               </PrimaryButton>
