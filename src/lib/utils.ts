@@ -1,7 +1,7 @@
 "use client";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { BASE_URL } from "./axios";
+// import { BASE_URL } from "./axios";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -76,8 +76,9 @@ export function getFullImageUrl(url: any): string {
 
   // If it starts with /uploads/, prepend the base API URL
   if (url.startsWith("/uploads/")) {
-    const baseUrl = BASE_URL;
-    return `${baseUrl}${url}`;
+    // const baseUrl = BASE_URL;
+    // return `${baseUrl}${url}`;
+    return `/api${url}`;
   }
 
   // For other relative paths, return as is (like public folder assets)

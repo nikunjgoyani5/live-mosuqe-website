@@ -6,12 +6,22 @@ function normalizeBase(url: string) {
   return url.trim().replace(/\/$/, "");
 }
 
-const RAW_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://api.livemosque.live";
-export const BASE_URL = normalizeBase(RAW_BASE_URL);
+function getBaseURL() {
+  // Server-side (Next.js SSR)
+  if (typeof window === "undefined") {
+    if (!process.env.INTERNAL_API_URL) {
+      throw new Error("INTERNAL_API_URL is not defined");
+    }
+    return process.env.INTERNAL_API_URL + "/api";
+  }
+
+  // Browser
+  return "/api";
+}
+console.log("BASE_URL", getBaseURL());
 
 export const api = axios.create({
-  baseURL: `${BASE_URL}/api`,
+  baseURL: getBaseURL(),
   withCredentials: true, // has effect in browser only
   headers: {
     Accept: "application/json",
