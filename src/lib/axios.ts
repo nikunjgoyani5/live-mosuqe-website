@@ -9,14 +9,14 @@ function normalizeBase(url: string) {
 function getBaseURL() {
   // Server-side (Next.js SSR)
   if (typeof window === "undefined") {
-    if (!process.env.INTERNAL_API_URL) {
-      throw new Error("INTERNAL_API_URL is not defined");
+    if (!process.env.NEXT_PUBLIC_INTERNAL_API_URL) {
+      throw new Error("NEXT_PUBLIC_INTERNAL_API_URL is not defined");
     }
-    return process.env.INTERNAL_API_URL + "/api";
+    return process.env.NEXT_PUBLIC_INTERNAL_API_URL + "/api";
   }
 
   // return "/api";
-  return process.env.INTERNAL_API_URL + "/api";
+  return process.env.NEXT_PUBLIC_INTERNAL_API_URL + "/api";
 }
 console.log("BASE_URL", getBaseURL());
 
