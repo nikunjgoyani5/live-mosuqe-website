@@ -15,8 +15,8 @@ function getBaseURL() {
     return process.env.INTERNAL_API_URL + "/api";
   }
 
-  // Browser
-  return "/api";
+  // return "/api";
+  return process.env.INTERNAL_API_URL + "/api";
 }
 console.log("BASE_URL", getBaseURL());
 
